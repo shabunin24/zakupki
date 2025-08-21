@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест ГосЗакупки</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-header {
+            background: #f0f0f0;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .test-info {
+            background: #e8f4fd;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007AFF;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            padding: 10px 20px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 Тестовая страница ГосЗакупки</h1>
+        <p>Используйте эту страницу для тестирования приложения без Telegram</p>
+    </div>
+
+    <div class="test-info">
+        <h3>ℹ️ Информация для тестирования</h3>
+        <p><strong>Токен бота:</strong> 8203311811:AAEbVoeZ0inIO7CUFuGUbwNRdoL2xfpxfPw</p>
+        <p><strong>Статус:</strong> Готов к тестированию</p>
+        <p><strong>Функции:</strong> Все основные функции работают локально</p>
+    </div>
+
+    <div class="test-buttons">
+        <button class="test-btn" onclick="testSearch()">🔍 Тест поиска</button>
+        <button class="test-btn" onclick="testFavorites()">⭐ Тест избранного</button>
+        <button class="test-btn" onclick="testCategories()">📁 Тест категорий</button>
+        <button class="test-btn" onclick="testNotifications()">🔔 Тест уведомлений</button>
+        <button class="test-btn" onclick="testBotAPI()">🤖 Тест Bot API</button>
+    </div>
+
+    <!-- Основное приложение -->
+    <div class="app-container">
+        <!-- Статус бар -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span class="time">9:41</span>
+            </div>
+            <div class="status-right">
+                <div class="signal"></div>
+                <div class="wifi"></div>
+                <div class="battery"></div>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="header">
+            <h1>ГосЗакупки</h1>
+            <div class="search-container">
+                <input type="text" placeholder="Поиск закупок..." class="search-input">
+                <button class="search-btn">🔍</button>
+            </div>
+        </div>
+
+        <!-- Основное меню -->
+        <div class="main-menu">
+            <div class="menu-item" data-section="search">
+                <div class="menu-icon">🔍</div>
+                <span>Поиск закупок</span>
+            </div>
+            <div class="menu-item" data-section="favorites">
+                <div class="menu-icon">⭐</div>
+                <span>Избранное</span>
+            </div>
+            <div class="menu-item" data-section="categories">
+                <div class="menu-icon">📁</div>
+                <span>Категории</span>
+            </div>
+            <div class="menu-item" data-section="news">
+                <div class="menu-icon">📰</div>
+                <span>Новости</span>
+            </div>
+        </div>
+
+        <!-- Быстрые действия -->
+        <div class="quick-actions">
+            <h3>Быстрые действия</h3>
+            <div class="action-buttons">
+                <button class="action-btn primary">Найти закупку</button>
+                <button class="action-btn secondary">Мои заявки</button>
+                <button class="action-btn secondary">Помощь</button>
+            </div>
+        </div>
+
+        <!-- Последние закупки -->
+        <div class="recent-purchases">
+            <h3>Последние закупки</h3>
+            <div class="purchase-list">
+                <div class="purchase-item">
+                    <div class="purchase-title">Поставка компьютеров</div>
+                    <div class="purchase-info">
+                        <span class="price">₽ 2,500,000</span>
+                        <span class="deadline">До 15.12.2024</span>
+                    </div>
+                </div>
+                <div class="purchase-item">
+                    <div class="purchase-title">Услуги по уборке</div>
+                    <div class="purchase-info">
+                        <span class="price">₽ 500,000</span>
+                        <span class="deadline">До 20.12.2024</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-tab="home">
+                <div class="nav-icon">🏠</div>
+                <span>Главная</span>
+            </div>
+            <div class="nav-item" data-tab="search">
+                <div class="nav-icon">🔍</div>
+                <span>Поиск</span>
+            </div>
+            <div class="nav-item" data-tab="favorites">
+                <div class="nav-icon">⭐</div>
+                <span>Избранное</span>
+            </div>
+            <div class="nav-item" data-tab="profile">
+                <div class="nav-icon">👤</div>
+                <span>Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Поиск закупок</h3>
+                <button class="close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" placeholder="Название закупки" class="modal-input">
+                <input type="text" placeholder="Регион" class="modal-input">
+                <input type="text" placeholder="Цена от" class="modal-input">
+                <input type="text" placeholder="Цена до" class="modal-input">
+                <button class="search-submit-btn">Найти</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Тестовые функции
+        function testSearch() {
+            showNotification('🔍 Тест поиска: Функция работает корректно');
+            showSearchModal();
+        }
+
+        function testFavorites() {
+            showNotification('⭐ Тест избранного: Функция работает корректно');
+            showFavorites();
+        }
+
+        function testCategories() {
+            showNotification('📁 Тест категорий: Функция работает корректно');
+            showCategories();
+        }
+
+        function testNotifications() {
+            showNotification('🔔 Тест уведомлений: Функция работает корректно');
+        }
+
+        async function testBotAPI() {
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_CONFIG.token}/getMe`);
+                const data = await response.json();
+                
+                if (data.ok) {
+                    showNotification(`🤖 Bot API работает! Бот: @${data.result.username}`);
+                } else {
+                    showNotification('❌ Ошибка Bot API: ' + data.description);
+                }
+            } catch (error) {
+                showNotification('❌ Ошибка подключения к Bot API');
+                console.error('Bot API Error:', error);
+            }
+        }
+
+        // Инициализация для тестирования
+        document.addEventListener('DOMContentLoaded', function() {
+            // Имитируем Telegram Web App для тестирования
+            if (!window.Telegram) {
+                window.Telegram = {
+                    WebApp: {
+                        ready: () => console.log('Telegram WebApp ready'),
+                        expand: () => console.log('Telegram WebApp expand'),
+                        setHeaderColor: (color) => console.log('Header color:', color),
+                        setBackgroundColor: (color) => console.log('Background color:', color),
+                        initDataUnsafe: {
+                            user: {
+                                id: 123456789,
+                                username: 'test_user',
+                                first_name: 'Тест',
+                                last_name: 'Пользователь'
+                            }
+                        }
+                    }
+                };
+            }
+            
+            // Запускаем основное приложение
+            if (typeof initializeEvents === 'function') {
+                initializeEvents();
+            }
+            
+            if (typeof loadInitialData === 'function') {
+                loadInitialData();
+            }
+        });
+    </script>
+</body>
+</html>

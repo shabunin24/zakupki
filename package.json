@@ -1,0 +1,38 @@
+{
+  "name": "zakupki-telegram-mini-app",
+  "version": "1.0.0",
+  "description": "Telegram Mini App для работы с государственными закупками в стиле iOS",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 start-server.py",
+    "start:node": "npx http-server -p 8000 -c-1",
+    "test": "open test.html",
+    "build": "echo 'Приложение готово к развертыванию'",
+    "deploy": "echo 'Загрузите файлы на HTTPS хостинг'"
+  },
+  "keywords": [
+    "telegram",
+    "mini-app",
+    "zakupki",
+    "government",
+    "procurement",
+    "ios-style",
+    "russian"
+  ],
+  "author": "Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/zakupki-telegram-mini-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/zakupki-telegram-mini-app/issues"
+  },
+  "homepage": "https://github.com/your-username/zakupki-telegram-mini-app#readme"
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГосЗакупки</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Статус бар -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span class="time">9:41</span>
+            </div>
+            <div class="status-right">
+                <div class="signal"></div>
+                <div class="wifi"></div>
+                <div class="battery"></div>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="header">
+            <h1>ГосЗакупки</h1>
+            <div class="search-container">
+                <input type="text" placeholder="Поиск закупок..." class="search-input">
+                <button class="search-btn">🔍</button>
+            </div>
+        </div>
+
+        <!-- Основное меню -->
+        <div class="main-menu">
+            <div class="menu-item" data-section="search">
+                <div class="menu-icon">🔍</div>
+                <span>Поиск закупок</span>
+            </div>
+            <div class="menu-item" data-section="favorites">
+                <div class="menu-icon">⭐</div>
+                <span>Избранное</span>
+            </div>
+            <div class="menu-item" data-section="categories">
+                <div class="menu-icon">📁</div>
+                <span>Категории</span>
+            </div>
+            <div class="menu-item" data-section="news">
+                <div class="menu-icon">📰</div>
+                <span>Новости</span>
+            </div>
+        </div>
+
+        <!-- Быстрые действия -->
+        <div class="quick-actions">
+            <h3>Быстрые действия</h3>
+            <div class="action-buttons">
+                <button class="action-btn primary">Найти закупку</button>
+                <button class="action-btn secondary">Мои заявки</button>
+                <button class="action-btn secondary">Помощь</button>
+            </div>
+        </div>
+
+        <!-- Последние закупки -->
+        <div class="recent-purchases">
+            <h3>Последние закупки</h3>
+            <div class="purchase-list">
+                <div class="purchase-item">
+                    <div class="purchase-title">Поставка компьютеров</div>
+                    <div class="purchase-info">
+                        <span class="price">₽ 2,500,000</span>
+                        <span class="deadline">До 15.12.2024</span>
+                    </div>
+                </div>
+                <div class="purchase-item">
+                    <div class="purchase-title">Услуги по уборке</div>
+                    <div class="purchase-info">
+                        <span class="price">₽ 500,000</span>
+                        <span class="deadline">До 20.12.2024</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-tab="home">
+                <div class="nav-icon">🏠</div>
+                <span>Главная</span>
+            </div>
+            <div class="nav-item" data-tab="search">
+                <div class="nav-icon">🔍</div>
+                <span>Поиск</span>
+            </div>
+            <div class="nav-item" data-tab="favorites">
+                <div class="nav-icon">⭐</div>
+                <span>Избранное</span>
+            </div>
+            <div class="nav-item" data-tab="profile">
+                <div class="nav-icon">👤</div>
+                <span>Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Поиск закупок</h3>
+                <button class="close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" placeholder="Название закупки" class="modal-input">
+                <input type="text" placeholder="Регион" class="modal-input">
+                <input type="text" placeholder="Цена от" class="modal-input">
+                <input type="text" placeholder="Цена до" class="modal-input">
+                <button class="search-submit-btn">Найти</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
