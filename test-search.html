@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест поиска - ГосЗакупки</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px 20px; margin: 5px; background: #007AFF; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест поиска ГосЗакупки</h1>
+    
+    <div class="test-section">
+        <h3>1. Проверка загрузки данных</h3>
+        <button onclick="testDataLoading()">Проверить загрузку данных</button>
+        <div id="dataResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Простой поиск</h3>
+        <input type="text" id="searchInput" placeholder="Введите текст для поиска">
+        <button onclick="testSimpleSearch()">Выполнить поиск</button>
+        <div id="searchResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Поиск с фильтрами</h3>
+        <select id="categoryFilter">
+            <option value="">Все категории</option>
+            <option value="Товары">Товары</option>
+            <option value="Услуги">Услуги</option>
+            <option value="Работы">Работы</option>
+        </select>
+        <button onclick="testFilteredSearch()">Поиск с фильтрами</button>
+        <div id="filteredResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Тест всех функций</h3>
+        <button onclick="runAllTests()">Запустить все тесты</button>
+        <div id="allTestsResult"></div>
+    </div>
+
+    <script src="https://shabunin24.github.io/zakupki/config.js"></script>
+    <script src="https://shabunin24.github.io/zakupki/script.js"></script>
+    
+    <script>
+        function testDataLoading() {
+            const resultDiv = document.getElementById('dataResult');
+            try {
+                if (typeof mockPurchases !== 'undefined') {
+                    resultDiv.innerHTML = `<div class="result success">✅ Данные загружены: ${mockPurchases.length} закупок</div>`;
+                    console.log('Mock purchases:', mockPurchases);
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ mockPurchases не определен</div>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<div class="result error">❌ Ошибка: ${e.message}</div>`;
+            }
+        }
+        
+        function testSimpleSearch() {
+            const resultDiv = document.getElementById('searchResult');
+            const searchText = document.getElementById('searchInput').value;
+            
+            try {
+                if (typeof searchPurchases === 'function') {
+                    const results = searchPurchases(searchText);
+                    resultDiv.innerHTML = `<div class="result success">✅ Поиск выполнен: найдено ${results.length} результатов</div>`;
+                    console.log('Search results:', results);
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Функция searchPurchases не найдена</div>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<div class="result error">❌ Ошибка поиска: ${e.message}</div>`;
+            }
+        }
+        
+        function testFilteredSearch() {
+            const resultDiv = document.getElementById('filteredResult');
+            const category = document.getElementById('categoryFilter').value;
+            
+            try {
+                if (typeof searchPurchases === 'function') {
+                    const filters = category ? { category: category } : {};
+                    const results = searchPurchases('', filters);
+                    resultDiv.innerHTML = `<div class="result success">✅ Фильтрованный поиск: найдено ${results.length} результатов</div>`;
+                    console.log('Filtered results:', results);
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Функция searchPurchases не найдена</div>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<div class="result error">❌ Ошибка фильтрованного поиска: ${e.message}</div>`;
+            }
+        }
+        
+        function runAllTests() {
+            const resultDiv = document.getElementById('allTestsResult');
+            let results = [];
+            
+            try {
+                // Тест 1: Данные
+                if (typeof mockPurchases !== 'undefined') {
+                    results.push('✅ mockPurchases загружен');
+                } else {
+                    results.push('❌ mockPurchases не загружен');
+                }
+                
+                // Тест 2: Функции
+                if (typeof searchPurchases === 'function') {
+                    results.push('✅ searchPurchases доступна');
+                } else {
+                    results.push('❌ searchPurchases недоступна');
+                }
+                
+                if (typeof performAdvancedSearch === 'function') {
+                    results.push('✅ performAdvancedSearch доступна');
+                } else {
+                    results.push('❌ performAdvancedSearch недоступна');
+                }
+                
+                if (typeof getCurrentFilters === 'function') {
+                    results.push('✅ getCurrentFilters доступна');
+                } else {
+                    results.push('❌ getCurrentFilters недоступна');
+                }
+                
+                // Тест 3: Поиск
+                try {
+                    const searchResults = searchPurchases('компьютер');
+                    results.push(`✅ Поиск работает: ${searchResults.length} результатов`);
+                } catch (e) {
+                    results.push(`❌ Поиск не работает: ${e.message}`);
+                }
+                
+                resultDiv.innerHTML = results.map(r => `<div class="result">${r}</div>`).join('');
+                
+            } catch (e) {
+                resultDiv.innerHTML = `<div class="result error">❌ Критическая ошибка: ${e.message}</div>`;
+            }
+        }
+        
+        // Автоматический запуск при загрузке
+        window.addEventListener('load', () => {
+            console.log('Страница загружена, проверяем доступность функций...');
+            setTimeout(() => {
+                testDataLoading();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
