@@ -250,6 +250,12 @@ function showSearchContent() {
     document.querySelector('.main-menu').style.display = 'none';
     document.querySelector('.quick-actions').style.display = 'none';
     document.querySelector('.recent-purchases').style.display = 'none';
+    
+    // Автоматически показываем все закупки при переходе на поиск
+    setTimeout(() => {
+        const results = searchPurchases('', {});
+        showSearchResults(results, '', {});
+    }, 100);
 }
 
 // Создание контента поиска
