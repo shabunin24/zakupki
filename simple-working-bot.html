@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой рабочий бот ГосЗакупки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f2f2f7;
+            color: #333;
+        }
+        
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: #007AFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            border-bottom-color: #007AFF;
+            color: #007AFF;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .search-button {
+            width: 100%;
+            padding: 12px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .search-button:hover {
+            background: #0056b3;
+        }
+        
+        .purchase-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007AFF;
+        }
+        
+        .purchase-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #007AFF;
+        }
+        
+        .purchase-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .purchase-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-favorite {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-apply {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007AFF;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🏛️ ГосЗакупки</h1>
+            <p>Найдите нужные закупки быстро и легко</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="home">🏠 Главная</div>
+            <div class="nav-tab" data-tab="search">🔍 Поиск</div>
+            <div class="nav-tab" data-tab="favorites">⭐ Избранное</div>
+            <div class="nav-tab" data-tab="profile">👤 Профиль</div>
+        </div>
+        
+        <!-- Главная вкладка -->
+        <div id="homeContent" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPurchases">0</div>
+                    <div class="stat-label">Всего закупок</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activePurchases">0</div>
+                    <div class="stat-label">Активных</div>
+                </div>
+            </div>
+            
+            <h3>📋 Последние закупки</h3>
+            <div id="recentPurchasesList"></div>
+        </div>
+        
+        <!-- Вкладка поиска -->
+        <div id="searchContent" class="tab-content">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Введите название закупки...">
+                <button class="search-button" onclick="performSearch()">🔍 Найти</button>
+            </div>
+            
+            <div id="searchResults"></div>
+        </div>
+        
+        <!-- Вкладка избранного -->
+        <div id="favoritesContent" class="tab-content">
+            <h3>⭐ Избранные закупки</h3>
+            <div id="favoritesList"></div>
+        </div>
+        
+        <!-- Вкладка профиля -->
+        <div id="profileContent" class="tab-content">
+            <h3>👤 Профиль пользователя</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="favoritesCount">0</div>
+                    <div class="stat-label">В избранном</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="applicationsCount">0</div>
+                    <div class="stat-label">Заявок подано</div>
+                </div>
+            </div>
+            
+            <button class="action-btn btn-favorite" onclick="clearAllData()" style="width: 100%; margin-top: 20px;">
+                🗑️ Очистить все данные
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Простые данные для тестирования
+        const mockPurchases = [
+            {
+                id: 1,
+                title: "Поставка компьютерной техники",
+                category: "Товары",
+                region: "Москва",
+                price: 2500000,
+                status: "active",
+                description: "Компьютеры и ноутбуки для государственных учреждений"
+            },
+            {
+                id: 2,
+                title: "Услуги по разработке ПО",
+                category: "Услуги",
+                region: "Санкт-Петербург",
+                price: 5000000,
+                status: "active",
+                description: "Разработка системы управления документооборотом"
+            },
+            {
+                id: 3,
+                title: "Строительные работы",
+                category: "Работы",
+                region: "Новосибирск",
+                price: 15000000,
+                status: "completed",
+                description: "Капитальный ремонт административного здания"
+            },
+            {
+                id: 4,
+                title: "Поставка медицинского оборудования",
+                category: "Товары",
+                region: "Краснодар",
+                price: 8000000,
+                status: "active",
+                description: "Диагностическое оборудование для больницы"
+            },
+            {
+                id: 5,
+                title: "Услуги по проведению аудита",
+                category: "Услуги",
+                region: "Екатеринбург",
+                price: 3000000,
+                status: "active",
+                description: "Комплексный аудит финансово-хозяйственной деятельности"
+            },
+            {
+                id: 6,
+                title: "Поставка лакокрасочных материалов",
+                category: "Товары",
+                region: "Москва",
+                price: 1200000,
+                status: "active",
+                description: "Краски, лаки, грунтовки для ремонтных работ"
+            },
+            {
+                id: 7,
+                title: "Услуги по покраске помещений",
+                category: "Услуги",
+                region: "Санкт-Петербург",
+                price: 2500000,
+                status: "active",
+                description: "Малярные работы, покраска стен и потолков"
+            }
+        ];
+
+        // Состояние приложения
+        let currentTab = 'home';
+        let favorites = [];
+        let userApplications = [];
+        let searchHistory = [];
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Бот инициализирован');
+            loadData();
+            updateStats();
+            showRecentPurchases();
+            setupEventListeners();
+        });
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Обработчики для вкладок
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        // Переключение вкладок
+        function switchTab(tabName) {
+            console.log('Переключаем на вкладку:', tabName);
+            
+            // Убираем активный класс со всех вкладок
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Активируем выбранную вкладку
+            const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+            const activeContent = document.getElementById(tabName + 'Content');
+            
+            if (activeTab && activeContent) {
+                activeTab.classList.add('active');
+                activeContent.classList.add('active');
+                currentTab = tabName;
+                
+                // Обновляем контент в зависимости от вкладки
+                switch(tabName) {
+                    case 'home':
+                        updateStats();
+                        showRecentPurchases();
+                        break;
+                    case 'favorites':
+                        showFavorites();
+                        break;
+                    case 'profile':
+                        updateProfileStats();
+                        break;
+                }
+                
+                console.log('Вкладка успешно переключена:', tabName);
+            } else {
+                console.error('Ошибка переключения вкладки:', tabName);
+            }
+        }
+
+        // Загрузка данных
+        function loadData() {
+            try {
+                const savedFavorites = localStorage.getItem('zakupkiFavorites');
+                const savedApplications = localStorage.getItem('zakupkiApplications');
+                const savedHistory = localStorage.getItem('zakupkiSearchHistory');
+                
+                if (savedFavorites) favorites = JSON.parse(savedFavorites);
+                if (savedApplications) userApplications = JSON.parse(savedApplications);
+                if (savedHistory) searchHistory = JSON.parse(savedHistory);
+                
+                console.log('Данные загружены:', { favorites, userApplications, searchHistory });
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            const totalPurchases = document.getElementById('totalPurchases');
+            const activePurchases = document.getElementById('activePurchases');
+            
+            if (totalPurchases) totalPurchases.textContent = mockPurchases.length;
+            if (activePurchases) {
+                const active = mockPurchases.filter(p => p.status === 'active').length;
+                activePurchases.textContent = active;
+            }
+        }
+
+        // Показ последних закупок
+        function showRecentPurchases() {
+            const container = document.getElementById('recentPurchasesList');
+            if (!container) return;
+            
+            const recent = mockPurchases.slice(0, 3);
+            let html = '';
+            
+            recent.forEach(purchase => {
+                html += `
+                    <div class="purchase-item">
+                        <div class="purchase-title">${purchase.title}</div>
+                        <div class="purchase-info">
+                            ${purchase.category} • ${purchase.region}<br>
+                            Цена: ${purchase.price.toLocaleString()} ₽<br>
+                            Статус: ${purchase.status === 'active' ? 'Активна' : 'Завершена'}
+                        </div>
+                        <div class="purchase-actions">
+                            <button class="action-btn btn-favorite" onclick="addToFavorites(${purchase.id})">
+                                ⭐ В избранное
+                            </button>
+                            <button class="action-btn btn-apply" onclick="submitApplication(${purchase.id})">
+                                📝 Подать заявку
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Выполнение поиска
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Введите поисковый запрос');
+                return;
+            }
+            
+            console.log('Выполняем поиск:', query);
+            
+            // Добавляем в историю
+            if (!searchHistory.includes(query)) {
+                searchHistory.unshift(query);
+                searchHistory = searchHistory.slice(0, 10);
+                localStorage.setItem('zakupkiSearchHistory', JSON.stringify(searchHistory));
+            }
+            
+            // Выполняем поиск
+            const results = searchPurchases(query);
+            displaySearchResults(results, query);
+        }
+
+        // Функция поиска
+        function searchPurchases(query, filters = {}) {
+            const queryLower = query.toLowerCase();
+            const results = [];
+            
+            mockPurchases.forEach(purchase => {
+                let matches = false;
+                
+                // Поиск по тексту
+                if (purchase.title.toLowerCase().includes(queryLower) ||
+                    purchase.description.toLowerCase().includes(queryLower) ||
+                    purchase.category.toLowerCase().includes(queryLower) ||
+                    purchase.region.toLowerCase().includes(queryLower)) {
+                    matches = true;
+                }
+                
+                // Применяем фильтры
+                if (filters.category && purchase.category !== filters.category) {
+                    matches = false;
+                }
+                if (filters.region && purchase.region !== filters.region) {
+                    matches = false;
+                }
+                if (filters.status && purchase.status !== filters.status) {
+                    matches = false;
+                }
+                
+                if (matches) {
+                    results.push(purchase);
+                }
+            });
+            
+            return results;
+        }
+
+        // Отображение результатов поиска
+        function displaySearchResults(results, query) {
+            const container = document.getElementById('searchResults');
+            if (!container) return;
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <h3>По вашему запросу ничего не найдено</h3>
+                        <p>Попробуйте изменить поисковый запрос</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `<h3>Найдено ${results.length} результатов по запросу "${query}"</h3>`;
+            
+            results.forEach(purchase => {
+                html += `
+                    <div class="purchase-item">
+                        <div class="purchase-title">${purchase.title}</div>
+                        <div class="purchase-info">
+                            ${purchase.category} • ${purchase.region}<br>
+                            Цена: ${purchase.price.toLocaleString()} ₽<br>
+                            Статус: ${purchase.status === 'active' ? 'Активна' : 'Завершена'}
+                        </div>
+                        <div class="purchase-actions">
+                            <button class="action-btn btn-favorite" onclick="addToFavorites(${purchase.id})">
+                                ⭐ В избранное
+                            </button>
+                            <button class="action-btn btn-apply" onclick="submitApplication(${purchase.id})">
+                                📝 Подать заявку
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Показ избранного
+        function showFavorites() {
+            const container = document.getElementById('favoritesList');
+            if (!container) return;
+            
+            if (favorites.length === 0) {
+                container.innerHTML = '<p>У вас пока нет избранных закупок</p>';
+                return;
+            }
+            
+            let html = '';
+            favorites.forEach(favoriteId => {
+                const purchase = mockPurchases.find(p => p.id === favoriteId);
+                if (purchase) {
+                    html += `
+                        <div class="purchase-item">
+                            <div class="purchase-title">${purchase.title}</div>
+                            <div class="purchase-info">
+                                ${purchase.category} • ${purchase.region}<br>
+                                Цена: ${purchase.price.toLocaleString()} ₽<br>
+                                Статус: ${purchase.status === 'active' ? 'Активна' : 'Завершена'}
+                            </div>
+                            <div class="purchase-actions">
+                                <button class="action-btn btn-favorite" onclick="removeFromFavorites(${purchase.id})">
+                                    🗑️ Убрать из избранного
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Обновление статистики профиля
+        function updateProfileStats() {
+            const favoritesCount = document.getElementById('favoritesCount');
+            const applicationsCount = document.getElementById('applicationsCount');
+            
+            if (favoritesCount) favoritesCount.textContent = favorites.length;
+            if (applicationsCount) applicationsCount.textContent = userApplications.length;
+        }
+
+        // Добавление в избранное
+        function addToFavorites(purchaseId) {
+            if (!favorites.includes(purchaseId)) {
+                favorites.push(purchaseId);
+                localStorage.setItem('zakupkiFavorites', JSON.stringify(favorites));
+                alert('Закупка добавлена в избранное!');
+                updateProfileStats();
+            } else {
+                alert('Закупка уже в избранном!');
+            }
+        }
+
+        // Удаление из избранного
+        function removeFromFavorites(purchaseId) {
+            const index = favorites.indexOf(purchaseId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                localStorage.setItem('zakupkiFavorites', JSON.stringify(favorites));
+                showFavorites();
+                updateProfileStats();
+                alert('Закупка удалена из избранного!');
+            }
+        }
+
+        // Подача заявки
+        function submitApplication(purchaseId) {
+            if (!userApplications.includes(purchaseId)) {
+                userApplications.push(purchaseId);
+                localStorage.setItem('zakupkiApplications', JSON.stringify(userApplications));
+                alert('Заявка подана!');
+                updateProfileStats();
+            } else {
+                alert('Заявка уже подана!');
+            }
+        }
+
+        // Очистка всех данных
+        function clearAllData() {
+            if (confirm('Вы уверены, что хотите очистить все данные?')) {
+                favorites = [];
+                userApplications = [];
+                searchHistory = [];
+                
+                localStorage.removeItem('zakupkiFavorites');
+                localStorage.removeItem('zakupkiApplications');
+                localStorage.removeItem('zakupkiSearchHistory');
+                
+                alert('Все данные очищены!');
+                location.reload();
+            }
+        }
+
+        // Обработка Enter в поиске
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.id === 'searchInput') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>

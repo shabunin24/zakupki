@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправленных вкладок</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-tabs { display: flex; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px; }
+        .nav-tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; border-radius: 8px; transition: all 0.3s; }
+        .nav-tab.active { background: #007AFF; color: white; }
+        .tab-content { display: none; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .tab-content.active { display: block; }
+        .test-button { padding: 10px 20px; margin: 5px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .test-button:hover { background: #218838; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; margin: 10px 0; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Тест исправленных вкладок</h1>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="home">🏠 Главная</div>
+            <div class="nav-tab" data-tab="search">🔍 Поиск</div>
+            <div class="nav-tab" data-tab="favorites">⭐ Избранное</div>
+            <div class="nav-tab" data-tab="profile">👤 Профиль</div>
+        </div>
+        
+        <div id="homeContent" class="tab-content active">
+            <h3>🏠 Главная вкладка</h3>
+            <p>Это главная страница приложения.</p>
+            <button class="test-button" onclick="testFunction('showHomeContent')">Тест showHomeContent</button>
+        </div>
+        
+        <div id="searchContent" class="tab-content">
+            <h3>🔍 Вкладка поиска</h3>
+            <p>Здесь будет интерфейс поиска.</p>
+            <button class="test-button" onclick="testFunction('showSearchContent')">Тест showSearchContent</button>
+        </div>
+        
+        <div id="favoritesContent" class="tab-content">
+            <h3>⭐ Вкладка избранного</h3>
+            <p>Здесь будут избранные закупки.</p>
+            <button class="test-button" onclick="testFunction('showFavoritesContent')">Тест showFavoritesContent</button>
+        </div>
+        
+        <div id="profileContent" class="tab-content">
+            <h3>👤 Вкладка профиля</h3>
+            <p>Здесь будет профиль пользователя.</p>
+            <button class="test-button" onclick="testFunction('showProfileContent')">Тест showProfileContent</button>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h4>📊 Лог выполнения:</h4>
+            <div id="executionLog" class="log">Лог будет показан здесь...</div>
+            <button class="test-button" onclick="clearLog()">Очистить лог</button>
+        </div>
+    </div>
+
+    <script>
+        let log = [];
+        
+        // Функция логирования
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            log.push({ timestamp, message, type });
+            updateLog();
+        }
+        
+        // Обновление лога
+        function updateLog() {
+            const logContainer = document.getElementById('executionLog');
+            if (!logContainer) return;
+            
+            let html = '';
+            log.slice(-20).forEach(entry => {
+                const color = entry.type === 'error' ? '#f8d7da' : entry.type === 'success' ? '#d4edda' : '#f8f9fa';
+                html += `<div style="background: ${color}; padding: 5px; margin: 2px 0; border-radius: 3px;">`;
+                html += `${entry.timestamp}: ${entry.message}`;
+                html += '</div>';
+            });
+            
+            logContainer.innerHTML = html;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Очистка лога
+        function clearLog() {
+            log = [];
+            updateLog();
+        }
+        
+        // Простая функция переключения вкладок
+        function switchTab(tabName) {
+            addLog(`Переключаем на вкладку: ${tabName}`, 'info');
+            
+            try {
+                // Убираем активный класс со всех вкладок
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Активируем выбранную вкладку
+                const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+                const activeContent = document.getElementById(tabName + 'Content');
+                
+                if (activeTab && activeContent) {
+                    activeTab.classList.add('active');
+                    activeContent.classList.add('active');
+                    addLog(`✅ Вкладка "${tabName}" успешно переключена`, 'success');
+                } else {
+                    addLog(`❌ Ошибка: элементы вкладки "${tabName}" не найдены`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Критическая ошибка переключения вкладки: ${error.message}`, 'error');
+            }
+        }
+        
+        // Тест функций
+        function testFunction(functionName) {
+            addLog(`Тестируем функцию: ${functionName}`, 'info');
+            
+            try {
+                if (typeof window[functionName] === 'function') {
+                    window[functionName]();
+                    addLog(`✅ Функция ${functionName} выполнена успешно`, 'success');
+                } else {
+                    addLog(`❌ Функция ${functionName} не найдена`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Ошибка выполнения функции ${functionName}: ${error.message}`, 'error');
+            }
+        }
+        
+        // Настройка обработчиков событий
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('Страница загружена', 'success');
+            
+            // Обработчики для вкладок
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+            
+            addLog('Обработчики событий настроены', 'success');
+        });
+        
+        // Глобальные функции для тестирования
+        window.showHomeContent = function() {
+            addLog('Вызвана функция showHomeContent', 'info');
+            // Здесь можно добавить логику показа домашнего контента
+        };
+        
+        window.showSearchContent = function() {
+            addLog('Вызвана функция showSearchContent', 'info');
+            // Здесь можно добавить логику показа контента поиска
+        };
+        
+        window.showFavoritesContent = function() {
+            addLog('Вызвана функция showFavoritesContent', 'info');
+            // Здесь можно добавить логику показа избранного
+        };
+        
+        window.showProfileContent = function() {
+            addLog('Вызвана функция showProfileContent', 'info');
+            // Здесь можно добавить логику показа профиля
+        };
+    </script>
+</body>
+</html>

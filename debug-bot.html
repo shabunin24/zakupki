@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диагностика бота ГосЗакупки</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        .debug-info { font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .test-button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Диагностика бота ГосЗакупки</h1>
+    
+    <div class="debug-section">
+        <h3>📋 Тест 1: Загрузка файлов</h3>
+        <div id="fileTest">
+            <p>Проверяем загрузку файлов...</p>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>⚙️ Тест 2: Основные функции</h3>
+        <div id="functionTest">
+            <p>Проверяем функции...</p>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🔍 Тест 3: Поиск</h3>
+        <div id="searchTest">
+            <p>Проверяем поиск...</p>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🏠 Тест 4: Вкладки</h3>
+        <div id="tabTest">
+            <p>Проверяем вкладки...</p>
+        </div>
+        <div>
+            <button class="test-button" onclick="testTab('home')">🏠 Главная</button>
+            <button class="test-button" onclick="testTab('search')">🔍 Поиск</button>
+            <button class="test-button" onclick="testTab('favorites')">⭐ Избранное</button>
+            <button class="test-button" onclick="testTab('profile')">👤 Профиль</button>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>📱 Тест 5: Telegram Web App</h3>
+        <div id="telegramTest">
+            <p>Проверяем Telegram...</p>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🚨 Ошибки консоли</h3>
+        <div id="consoleErrors">
+            <p>Ошибки будут показаны здесь...</p>
+        </div>
+        <button class="test-button" onclick="checkConsoleErrors()">Проверить ошибки</button>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+        let consoleErrors = [];
+        
+        // Перехватываем ошибки консоли
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.error = function(...args) {
+            consoleErrors.push({ type: 'error', args, timestamp: new Date().toISOString() });
+            originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            consoleErrors.push({ type: 'warn', args, timestamp: new Date().toISOString() });
+            originalWarn.apply(console, args);
+        };
+        
+        // Тест загрузки файлов
+        function testFileLoading() {
+            const fileTest = document.getElementById('fileTest');
+            let html = '<h4>Проверка файлов:</h4>';
+            
+            const files = [
+                { name: 'config.js', url: 'config.js' },
+                { name: 'script.js', url: 'script.js' },
+                { name: 'styles.css', url: 'styles.css' }
+            ];
+            
+            let successCount = 0;
+            files.forEach(file => {
+                fetch(file.url)
+                    .then(response => {
+                        if (response.ok) {
+                            html += `<div class="debug-info success">✅ ${file.name} - загружен (${response.status})</div>`;
+                            successCount++;
+                        } else {
+                            html += `<div class="debug-info error">❌ ${file.name} - ошибка ${response.status}</div>`;
+                        }
+                        
+                        if (successCount === files.length) {
+                            updateFileTest();
+                        }
+                    })
+                    .catch(error => {
+                        html += `<div class="debug-info error">❌ ${file.name} - ошибка загрузки: ${error.message}</div>`;
+                        if (successCount === files.length) {
+                            updateFileTest();
+                        }
+                    });
+            });
+            
+            function updateFileTest() {
+                fileTest.innerHTML = html;
+                fileTest.parentElement.className = `debug-section ${successCount === files.length ? 'success' : 'error'}`;
+            }
+        }
+        
+        // Тест функций
+        function testFunctions() {
+            const functionTest = document.getElementById('functionTest');
+            let html = '<h4>Проверка функций:</h4>';
+            
+            const functions = [
+                'switchTab',
+                'showTabContent',
+                'hideAllSections',
+                'showHomeContent',
+                'showSearchContent',
+                'showFavoritesContent',
+                'showProfileContent',
+                'searchPurchases',
+                'performSearch',
+                'addToFavorites'
+            ];
+            
+            let successCount = 0;
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    html += `<div class="debug-info success">✅ ${funcName} - найдена</div>`;
+                    successCount++;
+                } else {
+                    html += `<div class="debug-info error">❌ ${funcName} - не найдена</div>`;
+                }
+            });
+            
+            html += `<div class="debug-info ${successCount === functions.length ? 'success' : 'error'}">`;
+            html += `📊 Результат: ${successCount}/${functions.length} функций найдено`;
+            html += '</div>';
+            
+            functionTest.innerHTML = html;
+            functionTest.parentElement.className = `debug-section ${successCount === functions.length ? 'success' : 'error'}`;
+        }
+        
+        // Тест поиска
+        function testSearch() {
+            const searchTest = document.getElementById('searchTest');
+            let html = '<h4>Проверка поиска:</h4>';
+            
+            // Проверяем наличие данных
+            if (typeof mockPurchases !== 'undefined') {
+                html += `<div class="debug-info success">✅ mockPurchases найдены (${mockPurchases.length} закупок)</div>`;
+                
+                // Проверяем поиск
+                if (typeof searchPurchases === 'function') {
+                    try {
+                        const results = searchPurchases('краска', {});
+                        html += `<div class="debug-info success">✅ Поиск работает, найдено: ${results.length} результатов</div>`;
+                    } catch (error) {
+                        html += `<div class="debug-info error">❌ Ошибка поиска: ${error.message}</div>`;
+                    }
+                } else {
+                    html += `<div class="debug-info error">❌ Функция searchPurchases не найдена</div>`;
+                }
+            } else {
+                html += `<div class="debug-info error">❌ mockPurchases не найдены</div>`;
+            }
+            
+            searchTest.innerHTML = html;
+        }
+        
+        // Тест вкладок
+        function testTabs() {
+            const tabTest = document.getElementById('tabTest');
+            let html = '<h4>Проверка вкладок:</h4>';
+            
+            // Проверяем элементы навигации
+            const navItems = document.querySelectorAll('.nav-item');
+            if (navItems.length > 0) {
+                html += `<div class="debug-info success">✅ Найдено ${navItems.length} элементов навигации</div>`;
+                
+                // Проверяем обработчики
+                navItems.forEach((item, index) => {
+                    const tab = item.dataset.tab;
+                    html += `<div class="debug-info">📍 Вкладка ${index + 1}: ${tab}</div>`;
+                });
+            } else {
+                html += `<div class="debug-info error">❌ Элементы навигации не найдены</div>`;
+            }
+            
+            // Проверяем основные секции
+            const sections = ['main-menu', 'quick-actions', 'recent-purchases'];
+            sections.forEach(section => {
+                const element = document.querySelector(`.${section}`);
+                if (element) {
+                    html += `<div class="debug-info success">✅ Секция ${section} найдена</div>`;
+                } else {
+                    html += `<div class="debug-info error">❌ Секция ${section} не найдена</div>`;
+                }
+            });
+            
+            tabTest.innerHTML = html;
+        }
+        
+        // Тест Telegram Web App
+        function testTelegram() {
+            const telegramTest = document.getElementById('telegramTest');
+            let html = '<h4>Проверка Telegram Web App:</h4>';
+            
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                html += `<div class="debug-info success">✅ Telegram Web App API доступен</div>`;
+                
+                try {
+                    const tg = Telegram.WebApp;
+                    html += `<div class="debug-info">📱 Версия: ${tg.version}</div>`;
+                    html += `<div class="debug-info">🌐 Платформа: ${tg.platform}</div>`;
+                    html += `<div class="debug-info">📏 Размер: ${tg.viewportHeight}x${tg.viewportWidth}</div>`;
+                    
+                    if (tg.initData) {
+                        html += `<div class="debug-info success">✅ Данные инициализации получены</div>`;
+                    } else {
+                        html += `<div class="debug-info warning">⚠️ Данные инициализации не получены</div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="debug-info error">❌ Ошибка Telegram API: ${error.message}</div>`;
+                }
+            } else {
+                html += `<div class="debug-info error">❌ Telegram Web App API недоступен</div>`;
+            }
+            
+            telegramTest.innerHTML = html;
+        }
+        
+        // Проверка ошибок консоли
+        function checkConsoleErrors() {
+            const consoleErrorsDiv = document.getElementById('consoleErrors');
+            let html = '<h4>Ошибки консоли:</h4>';
+            
+            if (consoleErrors.length === 0) {
+                html += '<div class="debug-info success">✅ Ошибок в консоли не обнаружено</div>';
+            } else {
+                consoleErrors.forEach((error, index) => {
+                    html += `<div class="debug-info ${error.type === 'error' ? 'error' : 'warning'}">`;
+                    html += `${error.type === 'error' ? '❌' : '⚠️'} ${error.timestamp}: `;
+                    html += error.args.map(arg => String(arg)).join(' ');
+                    html += '</div>';
+                });
+            }
+            
+            consoleErrorsDiv.innerHTML = html;
+        }
+        
+        // Тест переключения вкладок
+        function testTab(tabName) {
+            console.log('Тестируем вкладку:', tabName);
+            
+            if (typeof switchTab === 'function') {
+                try {
+                    switchTab(tabName);
+                    console.log('✅ Вкладка переключена успешно');
+                } catch (error) {
+                    console.error('❌ Ошибка переключения вкладки:', error);
+                }
+            } else {
+                console.error('❌ Функция switchTab не найдена');
+            }
+        }
+        
+        // Инициализация тестов
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Диагностика запущена');
+            
+            // Запускаем тесты с задержкой
+            setTimeout(() => {
+                testFileLoading();
+                testFunctions();
+                testSearch();
+                testTabs();
+                testTelegram();
+                checkConsoleErrors();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

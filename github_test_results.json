@@ -1,0 +1,40 @@
+{
+  "success_rate": 100.0,
+  "total_score": 38,
+  "total_possible": 38,
+  "production_ready": true,
+  "details": {
+    "github": {
+      "main_page": {
+        "score": 6,
+        "total": 6
+      },
+      "test_page": {
+        "score": 4,
+        "total": 4
+      },
+      "css": {
+        "score": 4,
+        "total": 4
+      },
+      "javascript": {
+        "score": 8,
+        "total": 8
+      },
+      "config": {
+        "score": 4,
+        "total": 4
+      }
+    },
+    "bot_api": true,
+    "advanced": {
+      "score": 8,
+      "total": 8
+    },
+    "performance": {
+      "score": 3,
+      "total": 3,
+      "avg_time": 271.31301164627075
+    }
+  }
+}

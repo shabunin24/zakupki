@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест исправленного бота ГосЗакупки</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        .test-button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; font-family: monospace; }
+        .test-result.success { background: #d4edda; color: #155724; }
+        .test-result.error { background: #f8d7da; color: #721c24; }
+        .test-result.warning { background: #fff3cd; color: #856404; }
+        .log-output { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; margin: 10px 0; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Тест исправленного бота ГосЗакупки</h1>
+        
+        <div class="test-section">
+            <h3>🔧 Тест 1: Инициализация</h3>
+            <button class="test-button" onclick="testInitialization()">Проверить инициализацию</button>
+            <div id="initTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Тест 2: Поиск</h3>
+            <input type="text" id="searchInput" placeholder="Введите 'краска' для теста" style="padding: 8px; margin-right: 10px; width: 200px;">
+            <button class="test-button" onclick="testSearch()">Тестировать поиск</button>
+            <div id="searchTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏠 Тест 3: Вкладки</h3>
+            <button class="test-button" onclick="testTab('home')">🏠 Главная</button>
+            <button class="test-button" onclick="testTab('search')">🔍 Поиск</button>
+            <button class="test-button" onclick="testTab('favorites')">⭐ Избранное</button>
+            <button class="test-button" onclick="testTab('profile')">👤 Профиль</button>
+            <div id="tabTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>⭐ Тест 4: Избранное</h3>
+            <button class="test-button" onclick="testFavorites()">Тестировать избранное</button>
+            <div id="favoritesTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📱 Тест 5: Telegram Web App</h3>
+            <button class="test-button" onclick="testTelegram()">Проверить Telegram API</button>
+            <div id="telegramTest"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🚨 Лог ошибок</h3>
+            <button class="test-button" onclick="clearLog()">Очистить лог</button>
+            <div id="errorLog" class="log-output">Лог будет показан здесь...</div>
+        </div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+        let errorLog = [];
+        
+        // Перехватываем ошибки
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        
+        console.error = function(...args) {
+            const message = args.map(arg => String(arg)).join(' ');
+            errorLog.push({ type: 'error', message, timestamp: new Date().toISOString() });
+            originalError.apply(console, args);
+            updateErrorLog();
+        };
+        
+        console.warn = function(...args) {
+            const message = args.map(arg => String(arg)).join(' ');
+            errorLog.push({ type: 'warn', message, timestamp: new Date().toISOString() });
+            originalWarn.apply(console, args);
+            updateErrorLog();
+        };
+        
+        console.log = function(...args) {
+            const message = args.map(arg => String(arg)).join(' ');
+            if (message.includes('✅') || message.includes('❌') || message.includes('⚠️')) {
+                errorLog.push({ type: 'log', message, timestamp: new Date().toISOString() });
+                updateErrorLog();
+            }
+            originalLog.apply(console, args);
+        };
+        
+        // Обновление лога ошибок
+        function updateErrorLog() {
+            const logContainer = document.getElementById('errorLog');
+            if (!logContainer) return;
+            
+            let html = '';
+            errorLog.slice(-20).forEach(entry => {
+                const icon = entry.type === 'error' ? '❌' : entry.type === 'warn' ? '⚠️' : 'ℹ️';
+                const color = entry.type === 'error' ? '#f8d7da' : entry.type === 'warn' ? '#fff3cd' : '#d1ecf1';
+                html += `<div style="background: ${color}; padding: 5px; margin: 2px 0; border-radius: 3px;">`;
+                html += `${icon} ${entry.timestamp}: ${entry.message}`;
+                html += '</div>';
+            });
+            
+            logContainer.innerHTML = html;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Очистка лога
+        function clearLog() {
+            errorLog = [];
+            updateErrorLog();
+        }
+        
+        // Тест инициализации
+        function testInitialization() {
+            const initTest = document.getElementById('initTest');
+            let html = '<h4>Проверка инициализации:</h4>';
+            
+            // Проверяем основные переменные
+            const variables = [
+                { name: 'mockPurchases', value: typeof mockPurchases !== 'undefined' ? mockPurchases.length : 'не определен' },
+                { name: 'favorites', value: typeof favorites !== 'undefined' ? favorites.length : 'не определен' },
+                { name: 'userApplications', value: typeof userApplications !== 'undefined' ? userApplications.length : 'не определен' },
+                { name: 'searchHistory', value: typeof searchHistory !== 'undefined' ? searchHistory.length : 'не определен' }
+            ];
+            
+            variables.forEach(variable => {
+                if (variable.value !== 'не определен') {
+                    html += `<div class="test-result success">✅ ${variable.name}: ${variable.value}</div>`;
+                } else {
+                    html += `<div class="test-result error">❌ ${variable.name}: ${variable.value}</div>`;
+                }
+            });
+            
+            // Проверяем основные функции
+            const functions = [
+                'switchTab',
+                'searchPurchases',
+                'addToFavorites',
+                'performSearch'
+            ];
+            
+            let functionCount = 0;
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    html += `<div class="test-result success">✅ ${funcName}: функция найдена</div>`;
+                    functionCount++;
+                } else {
+                    html += `<div class="test-result error">❌ ${funcName}: функция не найдена</div>`;
+                }
+            });
+            
+            html += `<div class="test-result ${functionCount === functions.length ? 'success' : 'error'}">`;
+            html += `📊 Результат: ${functionCount}/${functions.length} функций найдено`;
+            html += '</div>';
+            
+            initTest.innerHTML = html;
+        }
+        
+        // Тест поиска
+        function testSearch() {
+            const searchTest = document.getElementById('searchTest');
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                searchTest.innerHTML = '<div class="test-result warning">⚠️ Введите поисковый запрос</div>';
+                return;
+            }
+            
+            let html = `<h4>Тест поиска по запросу "${query}":</h4>`;
+            
+            try {
+                if (typeof searchPurchases === 'function') {
+                    const results = searchPurchases(query, {});
+                    html += `<div class="test-result success">✅ Поиск выполнен успешно</div>`;
+                    html += `<div class="test-result success">🔍 Найдено результатов: ${results.length}</div>`;
+                    
+                    if (results.length > 0) {
+                        html += '<h5>Результаты:</h5>';
+                        results.slice(0, 3).forEach(result => {
+                            html += `<div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 4px;">`;
+                            html += `<strong>${result.title}</strong><br>`;
+                            html += `${result.category} • ${result.region} • ${result.price.toLocaleString()} ₽`;
+                            html += '</div>';
+                        });
+                    }
+                } else {
+                    html += '<div class="test-result error">❌ Функция searchPurchases не найдена</div>';
+                }
+            } catch (error) {
+                html += `<div class="test-result error">❌ Ошибка поиска: ${error.message}</div>`;
+            }
+            
+            searchTest.innerHTML = html;
+        }
+        
+        // Тест вкладок
+        function testTab(tabName) {
+            const tabTest = document.getElementById('tabTest');
+            let html = `<h4>Тест вкладки "${tabName}":</h4>`;
+            
+            try {
+                if (typeof switchTab === 'function') {
+                    switchTab(tabName);
+                    html += `<div class="test-result success">✅ Вкладка "${tabName}" переключена успешно</div>`;
+                    
+                    // Проверяем, что контент вкладки отображается
+                    const tabContent = document.getElementById(tabName + 'Content');
+                    if (tabContent) {
+                        html += `<div class="test-result success">✅ Контент вкладки найден</div>`;
+                    } else {
+                        html += `<div class="test-result warning">⚠️ Контент вкладки не найден</div>`;
+                    }
+                } else {
+                    html += '<div class="test-result error">❌ Функция switchTab не найдена</div>';
+                }
+            } catch (error) {
+                html += `<div class="test-result error">❌ Ошибка переключения вкладки: ${error.message}</div>`;
+            }
+            
+            tabTest.innerHTML = html;
+        }
+        
+        // Тест избранного
+        function testFavorites() {
+            const favoritesTest = document.getElementById('favoritesTest');
+            let html = '<h4>Тест избранного:</h4>';
+            
+            try {
+                if (typeof addToFavorites === 'function') {
+                    // Добавляем тестовую закупку в избранное
+                    addToFavorites(1);
+                    html += '<div class="test-result success">✅ Закупка добавлена в избранное</div>';
+                    
+                    // Проверяем количество избранных
+                    const favoritesCount = favorites ? favorites.length : 0;
+                    html += `<div class="test-result success">⭐ В избранном: ${favoritesCount} закупок</div>`;
+                    
+                    if (favoritesCount > 0) {
+                        html += '<h5>Избранные закупки:</h5>';
+                        favorites.forEach(id => {
+                            const purchase = mockPurchases.find(p => p.id === id);
+                            if (purchase) {
+                                html += `<div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 4px;">`;
+                                html += `<strong>${purchase.title}</strong> (ID: ${purchase.id})`;
+                                html += '</div>';
+                            }
+                        });
+                    }
+                } else {
+                    html += '<div class="test-result error">❌ Функция addToFavorites не найдена</div>';
+                }
+            } catch (error) {
+                html += `<div class="test-result error">❌ Ошибка тестирования избранного: ${error.message}</div>`;
+            }
+            
+            favoritesTest.innerHTML = html;
+        }
+        
+        // Тест Telegram Web App
+        function testTelegram() {
+            const telegramTest = document.getElementById('telegramTest');
+            let html = '<h4>Тест Telegram Web App:</h4>';
+            
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                try {
+                    const tg = Telegram.WebApp;
+                    html += '<div class="test-result success">✅ Telegram Web App API доступен</div>';
+                    html += `<div class="test-result success">📱 Версия: ${tg.version || 'не определена'}</div>`;
+                    html += `<div class="test-result success">🌐 Платформа: ${tg.platform || 'не определена'}</div>`;
+                    
+                    // Тестируем основные методы
+                    try {
+                        tg.ready();
+                        html += '<div class="test-result success">✅ tg.ready() выполнен успешно</div>';
+                    } catch (error) {
+                        html += `<div class="test-result warning">⚠️ tg.ready() ошибка: ${error.message}</div>`;
+                    }
+                    
+                    try {
+                        tg.expand();
+                        html += '<div class="test-result success">✅ tg.expand() выполнен успешно</div>';
+                    } catch (error) {
+                        html += `<div class="test-result warning">⚠️ tg.expand() ошибка: ${error.message}</div>`;
+                    }
+                    
+                } catch (error) {
+                    html += `<div class="test-result error">❌ Ошибка Telegram API: ${error.message}</div>`;
+                }
+            } else {
+                html += '<div class="test-result error">❌ Telegram Web App API недоступен</div>';
+            }
+            
+            telegramTest.innerHTML = html;
+        }
+        
+        // Автоматический запуск тестов при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Тест бота запущен');
+            
+            // Запускаем тесты с задержкой
+            setTimeout(() => {
+                testInitialization();
+                testTelegram();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

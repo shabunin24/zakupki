@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Быстрый тест Яндекс поиска</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .search-box { margin: 20px 0; }
+        input[type="text"] { padding: 10px; font-size: 16px; width: 300px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .results { margin-top: 20px; }
+        .result-item { padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Быстрый тест нативного поиска в стиле Яндекс</h1>
+    
+    <div class="test-section success">
+        <h3>✅ Тест 1: Проверка данных</h3>
+        <div id="dataTest">Проверяем...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔍 Тест 2: Поиск по слову "краска"</h3>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Введите 'краска' для теста">
+            <button onclick="testSearch()">Найти</button>
+        </div>
+        <div id="searchResults" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📊 Тест 3: Статистика поиска</h3>
+        <div id="searchStats"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🎯 Тест 4: Автодополнение</h3>
+        <div id="suggestionsTest"></div>
+    </div>
+
+    <script>
+        // Тестовые данные с краской
+        const testPurchases = [
+            {
+                id: 1,
+                title: "Поставка компьютерной техники",
+                category: "Товары",
+                region: "Москва",
+                price: 2500000,
+                description: "Компьютеры и ноутбуки для офиса"
+            },
+            {
+                id: 2,
+                title: "Поставка лакокрасочных материалов",
+                category: "Товары", 
+                region: "Санкт-Петербург",
+                price: 1200000,
+                description: "Краски, лаки, грунтовки для ремонта"
+            },
+            {
+                id: 3,
+                title: "Услуги по покраске помещений",
+                category: "Услуги",
+                region: "Новосибирск", 
+                price: 800000,
+                description: "Малярные работы, покраска стен и потолков"
+            }
+        ];
+
+        // Простой поисковый индекс
+        const searchIndex = new Map();
+        
+        function buildSearchIndex() {
+            testPurchases.forEach(purchase => {
+                const text = `${purchase.title} ${purchase.description} ${purchase.category} ${purchase.region}`.toLowerCase();
+                const words = text.split(/\s+/);
+                
+                words.forEach(word => {
+                    if (word.length > 2) {
+                        if (!searchIndex.has(word)) {
+                            searchIndex.set(word, []);
+                        }
+                        searchIndex.get(word).push(purchase.id);
+                    }
+                });
+            });
+            
+            console.log('Поисковый индекс построен:', searchIndex.size, 'слов');
+        }
+
+        // Функция поиска
+        function search(query) {
+            const queryLower = query.toLowerCase();
+            const results = [];
+            const foundIds = new Set();
+            
+            for (const [word, ids] of searchIndex) {
+                if (word.includes(queryLower) || queryLower.includes(word)) {
+                    ids.forEach(id => {
+                        if (!foundIds.has(id)) {
+                            const purchase = testPurchases.find(p => p.id === id);
+                            if (purchase) {
+                                const relevance = calculateRelevance(purchase, query);
+                                results.push({ purchase, relevance });
+                                foundIds.add(id);
+                            }
+                        }
+                    });
+                }
+            }
+            
+            return results.sort((a, b) => b.relevance - a.relevance);
+        }
+
+        // Расчет релевантности
+        function calculateRelevance(purchase, query) {
+            const queryLower = query.toLowerCase();
+            let relevance = 0;
+            
+            if (purchase.title.toLowerCase().includes(queryLower)) relevance += 100;
+            if (purchase.description.toLowerCase().includes(queryLower)) relevance += 50;
+            if (purchase.category.toLowerCase().includes(queryLower)) relevance += 30;
+            if (purchase.region.toLowerCase().includes(queryLower)) relevance += 20;
+            
+            return relevance;
+        }
+
+        // Тест данных
+        function testData() {
+            const dataTest = document.getElementById('dataTest');
+            const hasKraska = testPurchases.some(p => 
+                p.title.toLowerCase().includes('краска') || 
+                p.description.toLowerCase().includes('краска')
+            );
+            
+            if (hasKraska) {
+                dataTest.innerHTML = `
+                    ✅ Данные содержат закупки с краской<br>
+                    📊 Всего закупок: ${testPurchases.length}<br>
+                    🔍 Поисковый индекс: ${searchIndex.size} слов
+                `;
+            } else {
+                dataTest.innerHTML = '❌ Данные не содержат закупки с краской';
+                dataTest.parentElement.className = 'test-section error';
+            }
+        }
+
+        // Тест поиска
+        function testSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            const results = search(query);
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="result-item">❌ Результатов не найдено</div>';
+            } else {
+                let html = `<h4>Найдено ${results.length} результатов:</h4>`;
+                results.forEach(result => {
+                    html += `
+                        <div class="result-item">
+                            <strong>${result.purchase.title}</strong><br>
+                            📍 ${result.purchase.category} | ${result.purchase.region}<br>
+                            💰 ${result.purchase.price.toLocaleString()} ₽<br>
+                            📝 ${result.purchase.description}<br>
+                            ⭐ Релевантность: ${result.relevance}
+                        </div>
+                    `;
+                });
+                resultsDiv.innerHTML = html;
+            }
+            
+            // Показываем статистику
+            showSearchStats(results, query);
+        }
+
+        // Статистика поиска
+        function showSearchStats(results, query) {
+            const statsDiv = document.getElementById('searchStats');
+            
+            if (results.length === 0) {
+                statsDiv.innerHTML = '❌ Статистика недоступна - нет результатов';
+                return;
+            }
+            
+            const categories = new Set(results.map(r => r.purchase.category));
+            const regions = new Set(results.map(r => r.purchase.region));
+            const avgPrice = results.reduce((sum, r) => sum + r.purchase.price, 0) / results.length;
+            
+            statsDiv.innerHTML = `
+                <h4>📊 Статистика поиска по "${query}":</h4>
+                <div>🔢 Результатов: ${results.length}</div>
+                <div>📂 Категорий: ${categories.size}</div>
+                <div>🌍 Регионов: ${regions.size}</div>
+                <div>💰 Средняя цена: ${avgPrice.toLocaleString()} ₽</div>
+            `;
+        }
+
+        // Тест автодополнения
+        function testSuggestions() {
+            const suggestionsDiv = document.getElementById('suggestionsTest');
+            const query = 'краска';
+            
+            const suggestions = [];
+            for (const [word, ids] of searchIndex) {
+                if (word.startsWith(query.toLowerCase()) || word.includes(query.toLowerCase())) {
+                    const purchase = testPurchases.find(p => p.id === ids[0]);
+                    if (purchase) {
+                        suggestions.push(purchase.title);
+                    }
+                }
+            }
+            
+            if (suggestions.length > 0) {
+                suggestionsDiv.innerHTML = `
+                    <h4>💡 Подсказки для "${query}":</h4>
+                    ${suggestions.slice(0, 5).map(s => `<div>• ${s}</div>`).join('')}
+                `;
+            } else {
+                suggestionsDiv.innerHTML = '❌ Подсказки не найдены';
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            buildSearchIndex();
+            testData();
+            testSuggestions();
+            
+            // Автопоиск при Enter
+            document.getElementById('searchInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    testSearch();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

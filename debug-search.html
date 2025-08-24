@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отладка поиска - ГосЗакупки</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f2f2f7;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 16px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .search-btn {
+            padding: 12px 20px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .test-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #34C759;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .error { color: #FF3B30; }
+        .success { color: #34C759; }
+        .warning { color: #FF9500; }
+        .log-area {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔍 Отладка поиска ГосЗакупки</h1>
+        
+        <div class="test-section">
+            <h3>1. Проверка загрузки скриптов</h3>
+            <button class="test-btn" onclick="checkScripts()">Проверить скрипты</button>
+            <button class="test-btn" onclick="checkFunctions()">Проверить функции</button>
+            <button class="test-btn" onclick="checkData()">Проверить данные</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Тест поиска</h3>
+            <div class="search-container">
+                <input type="text" placeholder="Введите поисковый запрос..." class="search-input" id="debugSearchInput">
+                <button class="search-btn" onclick="testSearchFunction()">🔍 Тест поиска</button>
+            </div>
+            <button class="test-btn" onclick="testSearchWithQuery('компьютер')">Тест: "компьютер"</button>
+            <button class="test-btn" onclick="testSearchWithQuery('строительство')">Тест: "строительство"</button>
+            <button class="test-btn" onclick="testSearchWithQuery('медицина')">Тест: "медицина"</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Проверка обработчиков событий</h3>
+            <button class="test-btn" onclick="checkEventHandlers()">Проверить обработчики</button>
+            <button class="test-btn" onclick="testClickHandlers()">Тест кликов</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Лог отладки</h3>
+            <button class="test-btn" onclick="clearLog()">Очистить лог</button>
+            <div class="log-area" id="debugLog">Лог отладки будет здесь...</div>
+        </div>
+    </div>
+
+    <script>
+        // Функция логирования
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logArea.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        // Очистка лога
+        function clearLog() {
+            document.getElementById('debugLog').textContent = 'Лог очищен...\n';
+        }
+
+        // Проверка загрузки скриптов
+        function checkScripts() {
+            log('Проверяем загрузку скриптов...');
+            
+            try {
+                // Проверяем основные скрипты
+                if (typeof window.Telegram !== 'undefined') {
+                    log('✅ Telegram Web App API загружен', 'success');
+                } else {
+                    log('❌ Telegram Web App API не загружен', 'error');
+                }
+                
+                if (typeof window.BOT_CONFIG !== 'undefined') {
+                    log('✅ Конфигурация бота загружена', 'success');
+                    log(`Токен бота: ${window.BOT_CONFIG.token ? 'Есть' : 'Нет'}`, 'info');
+                } else {
+                    log('❌ Конфигурация бота не загружена', 'error');
+                }
+                
+                // Проверяем основные переменные
+                if (typeof mockPurchases !== 'undefined') {
+                    log(`✅ Данные закупок загружены: ${mockPurchases.length} записей`, 'success');
+                } else {
+                    log('❌ Данные закупок не загружены', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка при проверке скриптов: ${error.message}`, 'error');
+            }
+        }
+
+        // Проверка функций
+        function checkFunctions() {
+            log('Проверяем доступность функций...');
+            
+            const functions = [
+                'searchPurchases',
+                'performSimpleSearch',
+                'showSearchResultsModal',
+                'addToFavorites',
+                'showPurchaseDetails',
+                'formatPrice',
+                'formatDate'
+            ];
+            
+            let availableCount = 0;
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    log(`✅ ${funcName} доступна`, 'success');
+                    availableCount++;
+                } else {
+                    log(`❌ ${funcName} недоступна`, 'error');
+                }
+            });
+            
+            log(`Доступно функций: ${availableCount}/${functions.length}`, availableCount === functions.length ? 'success' : 'warning');
+        }
+
+        // Проверка данных
+        function checkData() {
+            log('Проверяем данные...');
+            
+            try {
+                if (typeof mockPurchases !== 'undefined') {
+                    log(`✅ mockPurchases: ${mockPurchases.length} записей`, 'success');
+                    
+                    // Проверяем структуру первой записи
+                    if (mockPurchases.length > 0) {
+                        const first = mockPurchases[0];
+                        const requiredFields = ['id', 'title', 'price', 'region', 'category'];
+                        const missingFields = requiredFields.filter(field => !(field in first));
+                        
+                        if (missingFields.length === 0) {
+                            log('✅ Структура данных корректна', 'success');
+                        } else {
+                            log(`⚠️ Отсутствуют поля: ${missingFields.join(', ')}`, 'warning');
+                        }
+                        
+                        log(`Пример записи: ${first.title}`, 'info');
+                    }
+                } else {
+                    log('❌ mockPurchases не определен', 'error');
+                }
+                
+                // Проверяем другие переменные
+                if (typeof favorites !== 'undefined') {
+                    log(`✅ favorites: ${favorites.length} записей`, 'success');
+                } else {
+                    log('❌ favorites не определен', 'error');
+                }
+                
+                if (typeof searchHistory !== 'undefined') {
+                    log(`✅ searchHistory: ${searchHistory.length} записей`, 'success');
+                } else {
+                    log('❌ searchHistory не определен', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка при проверке данных: ${error.message}`, 'error');
+            }
+        }
+
+        // Тест функции поиска
+        function testSearchFunction() {
+            log('Тестируем функцию поиска...');
+            
+            try {
+                if (typeof searchPurchases !== 'function') {
+                    log('❌ Функция searchPurchases недоступна', 'error');
+                    return;
+                }
+                
+                const query = document.getElementById('debugSearchInput').value.trim();
+                if (!query) {
+                    log('⚠️ Введите поисковый запрос', 'warning');
+                    return;
+                }
+                
+                log(`🔍 Выполняем поиск по запросу: "${query}"`);
+                const results = searchPurchases(query);
+                log(`✅ Найдено результатов: ${results.length}`, 'success');
+                
+                if (results.length > 0) {
+                    results.forEach((result, index) => {
+                        log(`  ${index + 1}. ${result.title} (${result.region})`, 'info');
+                    });
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка при поиске: ${error.message}`, 'error');
+            }
+        }
+
+        // Тест поиска с конкретным запросом
+        function testSearchWithQuery(query) {
+            log(`🔍 Тестируем поиск по запросу: "${query}"`);
+            
+            try {
+                if (typeof searchPurchases !== 'function') {
+                    log('❌ Функция searchPurchases недоступна', 'error');
+                    return;
+                }
+                
+                const results = searchPurchases(query);
+                log(`✅ Найдено результатов: ${results.length}`, 'success');
+                
+                if (results.length > 0) {
+                    results.forEach((result, index) => {
+                        log(`  ${index + 1}. ${result.title}`, 'info');
+                        log(`     Регион: ${result.region}, Цена: ${result.price} ${result.currency}`, 'info');
+                    });
+                } else {
+                    log('⚠️ Результаты не найдены', 'warning');
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка при поиске: ${error.message}`, 'error');
+            }
+        }
+
+        // Проверка обработчиков событий
+        function checkEventHandlers() {
+            log('Проверяем обработчики событий...');
+            
+            try {
+                // Проверяем элементы поиска
+                const searchInput = document.querySelector('.search-input');
+                const searchBtn = document.querySelector('.search-btn');
+                
+                if (searchInput) {
+                    log('✅ Поисковая строка найдена', 'success');
+                } else {
+                    log('❌ Поисковая строка не найдена', 'error');
+                }
+                
+                if (searchBtn) {
+                    log('✅ Кнопка поиска найдена', 'success');
+                } else {
+                    log('❌ Кнопка поиска не найдена', 'error');
+                }
+                
+                // Проверяем обработчики
+                const events = searchInput ? getEventListeners(searchInput) : [];
+                log(`Обработчики событий на поисковой строке: ${events.length}`, 'info');
+                
+            } catch (error) {
+                log(`❌ Ошибка при проверке обработчиков: ${error.message}`, 'error');
+            }
+        }
+
+        // Тест обработчиков кликов
+        function testClickHandlers() {
+            log('Тестируем обработчики кликов...');
+            
+            try {
+                // Проверяем, есть ли обработчики на кнопке поиска
+                const searchBtn = document.querySelector('.search-btn');
+                if (searchBtn) {
+                    log('✅ Кнопка поиска найдена, проверяем обработчики...', 'success');
+                    
+                    // Создаем тестовый обработчик
+                    const testHandler = () => {
+                        log('✅ Клик по кнопке поиска обработан!', 'success');
+                    };
+                    
+                    searchBtn.addEventListener('click', testHandler);
+                    log('✅ Тестовый обработчик добавлен', 'success');
+                    
+                    // Удаляем тестовый обработчик
+                    setTimeout(() => {
+                        searchBtn.removeEventListener('click', testHandler);
+                        log('✅ Тестовый обработчик удален', 'success');
+                    }, 1000);
+                    
+                } else {
+                    log('❌ Кнопка поиска не найдена', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка при тестировании обработчиков: ${error.message}`, 'error');
+            }
+        }
+
+        // Функция для получения обработчиков событий (упрощенная)
+        function getEventListeners(element) {
+            // Это упрощенная версия, в реальности нужно использовать devtools
+            return ['click', 'input', 'keypress'].filter(eventType => {
+                try {
+                    return element[`on${eventType}`] !== null;
+                } catch (e) {
+                    return false;
+                }
+            });
+        }
+
+        // Автоматическая проверка при загрузке
+        window.addEventListener('load', () => {
+            log('🚀 Страница загружена, начинаем отладку...', 'success');
+            
+            // Ждем немного для загрузки скриптов
+            setTimeout(() => {
+                log('⏳ Проверяем загрузку скриптов...', 'info');
+                checkScripts();
+                checkFunctions();
+                checkData();
+            }, 1000);
+        });
+
+        // Обработчик Enter для поисковой строки
+        document.getElementById('debugSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testSearchFunction();
+            }
+        });
+
+        log('🔧 Отладчик поиска инициализирован', 'success');
+    </script>
+</body>
+</html>

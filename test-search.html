@@ -5,155 +5,281 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тест поиска - ГосЗакупки</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px; }
-        .error { color: red; }
-        .success { color: green; }
-        button { padding: 10px 20px; margin: 5px; background: #007AFF; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f2f2f7;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .search-btn {
+            padding: 12px 20px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .test-info {
+            background: #e3f2fd;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>🧪 Тест поиска ГосЗакупки</h1>
-    
-    <div class="test-section">
-        <h3>1. Проверка загрузки данных</h3>
-        <button onclick="testDataLoading()">Проверить загрузку данных</button>
-        <div id="dataResult"></div>
-    </div>
-    
-    <div class="test-section">
-        <h3>2. Простой поиск</h3>
-        <input type="text" id="searchInput" placeholder="Введите текст для поиска">
-        <button onclick="testSimpleSearch()">Выполнить поиск</button>
-        <div id="searchResult"></div>
-    </div>
-    
-    <div class="test-section">
-        <h3>3. Поиск с фильтрами</h3>
-        <select id="categoryFilter">
-            <option value="">Все категории</option>
-            <option value="Товары">Товары</option>
-            <option value="Услуги">Услуги</option>
-            <option value="Работы">Работы</option>
-        </select>
-        <button onclick="testFilteredSearch()">Поиск с фильтрами</button>
-        <div id="filteredResult"></div>
-    </div>
-    
-    <div class="test-section">
-        <h3>4. Тест всех функций</h3>
-        <button onclick="runAllTests()">Запустить все тесты</button>
-        <div id="allTestsResult"></div>
+    <div class="test-container">
+        <h1>🔍 Тест поиска ГосЗакупки</h1>
+        
+        <div class="test-info">
+            <h3>Инструкция по тестированию:</h3>
+            <ol>
+                <li>Введите поисковый запрос (например: "компьютер", "строительство", "медицина")</li>
+                <li>Нажмите кнопку "Найти" или Enter</li>
+                <li>Проверьте, что результаты отображаются</li>
+                <li>Проверьте, что кнопки "В избранное" и "Подробнее" работают</li>
+            </ol>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" placeholder="Введите поисковый запрос..." class="search-input" id="testSearchInput">
+            <button class="search-btn" onclick="testSearch()">🔍 Найти</button>
+        </div>
+        
+        <div class="results" id="testResults">
+            <p>Введите поисковый запрос для начала поиска</p>
+        </div>
     </div>
 
-    <script src="https://shabunin24.github.io/zakupki/config.js"></script>
-    <script src="https://shabunin24.github.io/zakupki/script.js"></script>
-    
     <script>
-        function testDataLoading() {
-            const resultDiv = document.getElementById('dataResult');
-            try {
-                if (typeof mockPurchases !== 'undefined') {
-                    resultDiv.innerHTML = `<div class="result success">✅ Данные загружены: ${mockPurchases.length} закупок</div>`;
-                    console.log('Mock purchases:', mockPurchases);
-                } else {
-                    resultDiv.innerHTML = `<div class="result error">❌ mockPurchases не определен</div>`;
-                }
-            } catch (e) {
-                resultDiv.innerHTML = `<div class="result error">❌ Ошибка: ${e.message}</div>`;
+        // Имитация базы данных закупок
+        const mockPurchases = [
+            {
+                id: 1,
+                number: "0128300000123000001",
+                title: "Поставка компьютерной техники для государственных учреждений",
+                price: 2500000,
+                currency: "RUB",
+                customer: "Министерство цифрового развития",
+                region: "Москва",
+                deadline: "2024-12-15",
+                status: "active",
+                category: "Товары",
+                subcategory: "Компьютерная техника",
+                description: "Поставка персональных компьютеров, ноутбуков и периферийного оборудования"
+            },
+            {
+                id: 2,
+                number: "0128300000123000002",
+                title: "Услуги по уборке и содержанию зданий",
+                price: 500000,
+                currency: "RUB",
+                customer: "Администрация города",
+                region: "Санкт-Петербург",
+                deadline: "2024-12-20",
+                status: "active",
+                category: "Услуги",
+                subcategory: "Бытовые услуги",
+                description: "Комплексные услуги по уборке и содержанию административных зданий"
+            },
+            {
+                id: 3,
+                number: "0128300000123000003",
+                title: "Закупка медицинского оборудования",
+                price: 3500000,
+                currency: "RUB",
+                customer: "Министерство здравоохранения",
+                region: "Новосибирск",
+                deadline: "2025-01-10",
+                status: "active",
+                category: "Товары",
+                subcategory: "Медицинское оборудование",
+                description: "Поставка диагностического и лечебного медицинского оборудования"
+            },
+            {
+                id: 4,
+                number: "0128300000123000004",
+                title: "Строительные работы по ремонту дорог",
+                price: 15000000,
+                currency: "RUB",
+                customer: "Федеральное дорожное агентство",
+                region: "Краснодар",
+                deadline: "2025-02-15",
+                status: "active",
+                category: "Работы",
+                subcategory: "Строительные работы",
+                description: "Капитальный ремонт автомобильных дорог федерального значения"
             }
-        }
-        
-        function testSimpleSearch() {
-            const resultDiv = document.getElementById('searchResult');
-            const searchText = document.getElementById('searchInput').value;
+        ];
+
+        // Функция поиска
+        function searchPurchases(query) {
+            const lowerQuery = query.toLowerCase();
+            const results = [];
             
-            try {
-                if (typeof searchPurchases === 'function') {
-                    const results = searchPurchases(searchText);
-                    resultDiv.innerHTML = `<div class="result success">✅ Поиск выполнен: найдено ${results.length} результатов</div>`;
-                    console.log('Search results:', results);
-                } else {
-                    resultDiv.innerHTML = `<div class="result error">❌ Функция searchPurchases не найдена</div>`;
+            mockPurchases.forEach(purchase => {
+                let score = 0;
+                
+                // Поиск по названию
+                if (purchase.title.toLowerCase().includes(lowerQuery)) {
+                    score += 100;
                 }
-            } catch (e) {
-                resultDiv.innerHTML = `<div class="result error">❌ Ошибка поиска: ${e.message}</div>`;
-            }
-        }
-        
-        function testFilteredSearch() {
-            const resultDiv = document.getElementById('filteredResult');
-            const category = document.getElementById('categoryFilter').value;
+                
+                // Поиск по категории
+                if (purchase.category.toLowerCase().includes(lowerQuery) || 
+                    purchase.subcategory.toLowerCase().includes(lowerQuery)) {
+                    score += 50;
+                }
+                
+                // Поиск по региону
+                if (purchase.region.toLowerCase().includes(lowerQuery)) {
+                    score += 30;
+                }
+                
+                // Поиск по описанию
+                if (purchase.description.toLowerCase().includes(lowerQuery)) {
+                    score += 20;
+                }
+                
+                if (score > 0) {
+                    results.push({ ...purchase, score });
+                }
+            });
             
-            try {
-                if (typeof searchPurchases === 'function') {
-                    const filters = category ? { category: category } : {};
-                    const results = searchPurchases('', filters);
-                    resultDiv.innerHTML = `<div class="result success">✅ Фильтрованный поиск: найдено ${results.length} результатов</div>`;
-                    console.log('Filtered results:', results);
-                } else {
-                    resultDiv.innerHTML = `<div class="result error">❌ Функция searchPurchases не найдена</div>`;
-                }
-            } catch (e) {
-                resultDiv.innerHTML = `<div class="result error">❌ Ошибка фильтрованного поиска: ${e.message}</div>`;
-            }
+            return results.sort((a, b) => b.score - a.score);
         }
-        
-        function runAllTests() {
-            const resultDiv = document.getElementById('allTestsResult');
-            let results = [];
+
+        // Форматирование цены
+        function formatPrice(price, currency) {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0
+            }).format(price);
+        }
+
+        // Форматирование даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        // Тестовая функция поиска
+        function testSearch() {
+            const searchInput = document.getElementById('testSearchInput');
+            const query = searchInput.value.trim();
             
-            try {
-                // Тест 1: Данные
-                if (typeof mockPurchases !== 'undefined') {
-                    results.push('✅ mockPurchases загружен');
-                } else {
-                    results.push('❌ mockPurchases не загружен');
-                }
-                
-                // Тест 2: Функции
-                if (typeof searchPurchases === 'function') {
-                    results.push('✅ searchPurchases доступна');
-                } else {
-                    results.push('❌ searchPurchases недоступна');
-                }
-                
-                if (typeof performAdvancedSearch === 'function') {
-                    results.push('✅ performAdvancedSearch доступна');
-                } else {
-                    results.push('❌ performAdvancedSearch недоступна');
-                }
-                
-                if (typeof getCurrentFilters === 'function') {
-                    results.push('✅ getCurrentFilters доступна');
-                } else {
-                    results.push('❌ getCurrentFilters недоступна');
-                }
-                
-                // Тест 3: Поиск
-                try {
-                    const searchResults = searchPurchases('компьютер');
-                    results.push(`✅ Поиск работает: ${searchResults.length} результатов`);
-                } catch (e) {
-                    results.push(`❌ Поиск не работает: ${e.message}`);
-                }
-                
-                resultDiv.innerHTML = results.map(r => `<div class="result">${r}</div>`).join('');
-                
-            } catch (e) {
-                resultDiv.innerHTML = `<div class="result error">❌ Критическая ошибка: ${e.message}</div>`;
+            if (!query) {
+                alert('Введите поисковый запрос');
+                return;
+            }
+            
+            const results = searchPurchases(query);
+            displayResults(results, query);
+        }
+
+        // Отображение результатов
+        function displayResults(results, query) {
+            const resultsContainer = document.getElementById('testResults');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                        <h3>По вашему запросу ничего не найдено</h3>
+                        <p>Попробуйте изменить поисковый запрос</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `<h3>Найдено ${results.length} результатов по запросу "${query}"</h3>`;
+            
+            results.forEach(purchase => {
+                html += `
+                    <div class="result-item">
+                        <h4 style="margin-bottom: 8px; color: #333;">${purchase.title}</h4>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
+                            №${purchase.number} • ${purchase.region} • ${purchase.category}
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="color: #007AFF; font-weight: 600;">
+                                ${formatPrice(purchase.price, purchase.currency)}
+                            </span>
+                            <span style="color: #999; font-size: 12px;">
+                                До ${formatDate(purchase.deadline)}
+                            </span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="addToFavorites(${purchase.id})" 
+                                    style="flex: 1; padding: 8px; background: #007AFF; color: white; border: none; border-radius: 6px; font-size: 12px;">
+                                ⭐ В избранное
+                            </button>
+                            <button onclick="showDetails(${purchase.id})" 
+                                    style="flex: 1; padding: 8px; background: #f2f2f7; color: #007AFF; border: none; border-radius: 6px; font-size: 12px;">
+                                📋 Подробнее
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // Добавление в избранное
+        function addToFavorites(purchaseId) {
+            alert(`✅ Закупка №${purchaseId} добавлена в избранное!`);
+        }
+
+        // Показ деталей
+        function showDetails(purchaseId) {
+            const purchase = mockPurchases.find(p => p.id === purchaseId);
+            if (purchase) {
+                alert(`📋 Детали закупки:\n\n${purchase.title}\n\n${purchase.description}`);
             }
         }
-        
-        // Автоматический запуск при загрузке
-        window.addEventListener('load', () => {
-            console.log('Страница загружена, проверяем доступность функций...');
-            setTimeout(() => {
-                testDataLoading();
-            }, 1000);
+
+        // Поиск по Enter
+        document.getElementById('testSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testSearch();
+            }
         });
+
+        console.log('✅ Тестовый поиск инициализирован');
     </script>
 </body>
 </html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рабочий поиск - ГосЗакупки</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f2f2f7;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .search-btn {
+            padding: 12px 20px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .search-btn:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #007AFF;
+        }
+        .result-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .result-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .result-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+        .btn-secondary {
+            background: #f2f2f7;
+            color: #007AFF;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .stats {
+            background: #e3f2fd;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .quick-filters {
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #f2f2f7;
+            color: #007AFF;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            background: #e5e5e7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 ГосЗакупки</h1>
+            <p>Рабочий поиск закупок</p>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" placeholder="Введите название закупки, категорию или регион..." class="search-input" id="searchInput">
+            <button class="search-btn" onclick="performSearch()">🔍 Найти</button>
+        </div>
+        
+        <div class="quick-filters">
+            <button class="filter-btn" onclick="quickSearch('компьютер')">💻 Компьютеры</button>
+            <button class="filter-btn" onclick="quickSearch('строительство')">🏗️ Строительство</button>
+            <button class="filter-btn" onclick="quickSearch('медицина')">🏥 Медицина</button>
+            <button class="filter-btn" onclick="quickSearch('услуги')">🛠️ Услуги</button>
+            <button class="filter-btn" onclick="quickSearch('москва')">📍 Москва</button>
+        </div>
+        
+        <div class="stats" id="stats">
+            <strong>Всего закупок: 7</strong> • <strong>Категорий: 3</strong> • <strong>Регионов: 5</strong>
+        </div>
+        
+        <div class="results" id="results">
+            <div class="no-results">
+                <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                <h3>Введите поисковый запрос</h3>
+                <p>Используйте поисковую строку выше или быстрые фильтры</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Имитация базы данных закупок
+        const mockPurchases = [
+            {
+                id: 1,
+                number: "0128300000123000001",
+                title: "Поставка компьютерной техники для государственных учреждений",
+                price: 2500000,
+                currency: "RUB",
+                customer: "Министерство цифрового развития",
+                region: "Москва",
+                deadline: "2024-12-15",
+                status: "active",
+                category: "Товары",
+                subcategory: "Компьютерная техника",
+                description: "Поставка персональных компьютеров, ноутбуков и периферийного оборудования"
+            },
+            {
+                id: 2,
+                number: "0128300000123000002",
+                title: "Услуги по уборке и содержанию зданий",
+                price: 500000,
+                currency: "RUB",
+                customer: "Администрация города",
+                region: "Санкт-Петербург",
+                deadline: "2024-12-20",
+                status: "active",
+                category: "Услуги",
+                subcategory: "Бытовые услуги",
+                description: "Комплексные услуги по уборке и содержанию административных зданий"
+            },
+            {
+                id: 3,
+                number: "0128300000123000003",
+                title: "Закупка медицинского оборудования",
+                price: 3500000,
+                currency: "RUB",
+                customer: "Министерство здравоохранения",
+                region: "Новосибирск",
+                deadline: "2025-01-10",
+                status: "active",
+                category: "Товары",
+                subcategory: "Медицинское оборудование",
+                description: "Поставка диагностического и лечебного медицинского оборудования"
+            },
+            {
+                id: 4,
+                number: "0128300000123000004",
+                title: "Строительные работы по ремонту дорог",
+                price: 15000000,
+                currency: "RUB",
+                customer: "Федеральное дорожное агентство",
+                region: "Краснодар",
+                deadline: "2025-02-15",
+                status: "active",
+                category: "Работы",
+                subcategory: "Строительные работы",
+                description: "Капитальный ремонт автомобильных дорог федерального значения"
+            },
+            {
+                id: 5,
+                number: "0128300000123000005",
+                title: "Услуги по обучению персонала",
+                price: 800000,
+                currency: "RUB",
+                customer: "Министерство образования",
+                region: "Екатеринбург",
+                deadline: "2025-01-25",
+                status: "active",
+                category: "Услуги",
+                subcategory: "Образовательные услуги",
+                description: "Проведение курсов повышения квалификации для государственных служащих"
+            },
+            {
+                id: 6,
+                number: "0128300000123000006",
+                title: "Поставка лакокрасочных материалов и строительных смесей",
+                price: 1200000,
+                currency: "RUB",
+                customer: "Управление капитального строительства",
+                region: "Москва",
+                deadline: "2024-12-10",
+                status: "active",
+                category: "Товары",
+                subcategory: "Строительные материалы",
+                description: "Поставка красок, лаков, грунтовок, шпаклевок и других лакокрасочных материалов для ремонтных работ"
+            },
+            {
+                id: 7,
+                number: "0128300000123000007",
+                title: "Услуги по покраске и отделке помещений",
+                price: 2500000,
+                currency: "RUB",
+                customer: "Комитет по строительству СПб",
+                region: "Санкт-Петербург",
+                deadline: "2024-11-20",
+                status: "active",
+                category: "Услуги",
+                subcategory: "Отделочные работы",
+                description: "Выполнение малярных работ, покраска стен, потолков, поклейка обоев в административных зданиях"
+            }
+        ];
+
+        // Функция поиска
+        function searchPurchases(query) {
+            const lowerQuery = query.toLowerCase();
+            const results = [];
+            
+            mockPurchases.forEach(purchase => {
+                let score = 0;
+                
+                // Поиск по названию (высокий приоритет)
+                if (purchase.title.toLowerCase().includes(lowerQuery)) {
+                    score += 100;
+                }
+                
+                // Поиск по категории
+                if (purchase.category.toLowerCase().includes(lowerQuery) || 
+                    purchase.subcategory.toLowerCase().includes(lowerQuery)) {
+                    score += 50;
+                }
+                
+                // Поиск по региону
+                if (purchase.region.toLowerCase().includes(lowerQuery)) {
+                    score += 30;
+                }
+                
+                // Поиск по описанию
+                if (purchase.description.toLowerCase().includes(lowerQuery)) {
+                    score += 20;
+                }
+                
+                // Поиск по номеру закупки
+                if (purchase.number.includes(query)) {
+                    score += 80;
+                }
+                
+                if (score > 0) {
+                    results.push({ ...purchase, score });
+                }
+            });
+            
+            // Сортируем по релевантности
+            return results.sort((a, b) => b.score - a.score);
+        }
+
+        // Форматирование цены
+        function formatPrice(price, currency) {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0
+            }).format(price);
+        }
+
+        // Форматирование даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        // Выполнение поиска
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                alert('Введите поисковый запрос');
+                return;
+            }
+            
+            console.log(`🔍 Выполняем поиск по запросу: "${query}"`);
+            const results = searchPurchases(query);
+            displayResults(results, query);
+        }
+
+        // Быстрый поиск
+        function quickSearch(query) {
+            document.getElementById('searchInput').value = query;
+            performSearch();
+        }
+
+        // Отображение результатов
+        function displayResults(results, query) {
+            const resultsContainer = document.getElementById('results');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                        <h3>По вашему запросу ничего не найдено</h3>
+                        <p>Попробуйте изменить поисковый запрос</p>
+                        <p><strong>Поисковый запрос:</strong> "${query}"</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `<h3>Найдено ${results.length} результатов по запросу "${query}"</h3>`;
+            
+            results.forEach(purchase => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-title">${purchase.title}</div>
+                        <div class="result-details">
+                            <strong>№${purchase.number}</strong> • ${purchase.region} • ${purchase.category} → ${purchase.subcategory}<br>
+                            <strong>Цена:</strong> ${formatPrice(purchase.price, purchase.currency)} • 
+                            <strong>Срок:</strong> ${formatDate(purchase.deadline)}<br>
+                            <strong>Заказчик:</strong> ${purchase.customer}
+                        </div>
+                        <div class="result-actions">
+                            <button class="action-btn btn-primary" onclick="addToFavorites(${purchase.id})">
+                                ⭐ В избранное
+                            </button>
+                            <button class="action-btn btn-secondary" onclick="showDetails(${purchase.id})">
+                                📋 Подробнее
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // Добавление в избранное
+        function addToFavorites(purchaseId) {
+            const purchase = mockPurchases.find(p => p.id === purchaseId);
+            if (purchase) {
+                alert(`✅ Закупка "${purchase.title}" добавлена в избранное!`);
+                console.log('Добавлено в избранное:', purchase);
+            }
+        }
+
+        // Показ деталей
+        function showDetails(purchaseId) {
+            const purchase = mockPurchases.find(p => p.id === purchaseId);
+            if (purchase) {
+                const details = `
+📋 Детали закупки:
+
+${purchase.title}
+
+📊 Основная информация:
+• Номер: ${purchase.number}
+• Категория: ${purchase.category} → ${purchase.subcategory}
+• Регион: ${purchase.region}
+• Цена: ${formatPrice(purchase.price, purchase.currency)}
+• Срок подачи: ${formatDate(purchase.deadline)}
+• Статус: ${purchase.status === 'active' ? '🟢 Активна' : '🔴 Завершена'}
+
+👤 Заказчик: ${purchase.customer}
+
+📝 Описание:
+${purchase.description}
+                `;
+                
+                alert(details);
+                console.log('Детали закупки:', purchase);
+            }
+        }
+
+        // Поиск по Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Инициализация
+        console.log('✅ Рабочий поиск инициализирован');
+        console.log(`📊 Загружено ${mockPurchases.length} закупок`);
+        
+        // Показываем статистику
+        const categories = [...new Set(mockPurchases.map(p => p.category))];
+        const regions = [...new Set(mockPurchases.map(p => p.region))];
+        
+        document.getElementById('stats').innerHTML = `
+            <strong>Всего закупок: ${mockPurchases.length}</strong> • 
+            <strong>Категорий: ${categories.length}</strong> • 
+            <strong>Регионов: ${regions.length}</strong>
+        `;
+    </script>
+</body>
+</html>
