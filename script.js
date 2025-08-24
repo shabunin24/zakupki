@@ -298,47 +298,112 @@ function switchTab(tab) {
 
 // Показ контента вкладки
 function showTabContent(tab) {
-    hideAllSections();
+    console.log('Показываем контент вкладки:', tab);
     
-    switch(tab) {
-        case 'home':
+    try {
+        hideAllSections();
+        
+        switch(tab) {
+            case 'home':
+                showHomeContent();
+                break;
+            case 'search':
+                showSearchContent();
+                break;
+            case 'favorites':
+                showFavoritesContent();
+                break;
+            case 'profile':
+                showProfileContent();
+                break;
+            default:
+                console.log('Неизвестная вкладка:', tab);
+                showHomeContent();
+        }
+    } catch (error) {
+        console.error('Ошибка показа контента вкладки:', error);
+        // Показываем домашнюю вкладку как fallback
+        try {
             showHomeContent();
-            break;
-        case 'search':
-            showSearchContent();
-            break;
-        case 'favorites':
-            showFavoritesContent();
-            break;
-        case 'profile':
-            showProfileContent();
-            break;
-        default:
-            console.log('Неизвестная вкладка:', tab);
-            showHomeContent();
+        } catch (fallbackError) {
+            console.error('Критическая ошибка - не удается показать домашнюю вкладку:', fallbackError);
+        }
     }
 }
 
 // Скрытие всех секций
 function hideAllSections() {
+    console.log('Скрываем все секции');
+    
     const sections = [
         'main-menu', 'quick-actions', 'recent-purchases',
         'search-content', 'favorites-content', 'profile-content'
     ];
     
+    let hiddenCount = 0;
     sections.forEach(section => {
-        const element = document.querySelector(`.${section}`);
-        if (element) {
-            element.style.display = 'none';
+        try {
+            const element = document.querySelector(`.${section}`);
+            if (element) {
+                element.style.display = 'none';
+                hiddenCount++;
+            } else {
+                console.log(`Секция ${section} не найдена в DOM`);
+            }
+        } catch (error) {
+            console.warn(`Ошибка скрытия секции ${section}:`, error);
         }
     });
+    
+    console.log(`Скрыто секций: ${hiddenCount}/${sections.length}`);
 }
 
 // Показ домашнего контента
 function showHomeContent() {
-    document.querySelector('.main-menu').style.display = 'grid';
-    document.querySelector('.quick-actions').style.display = 'block';
-    document.querySelector('.recent-purchases').style.display = 'block';
+    console.log('Показываем домашний контент');
+    
+    try {
+        const mainMenu = document.querySelector('.main-menu');
+        const quickActions = document.querySelector('.quick-actions');
+        const recentPurchases = document.querySelector('.recent-purchases');
+        
+        let shownCount = 0;
+        
+        if (mainMenu) {
+            mainMenu.style.display = 'grid';
+            shownCount++;
+            console.log('✅ Главное меню показано');
+        } else {
+            console.warn('⚠️ Главное меню не найдено');
+        }
+        
+        if (quickActions) {
+            quickActions.style.display = 'block';
+            shownCount++;
+            console.log('✅ Быстрые действия показаны');
+        } else {
+            console.warn('⚠️ Быстрые действия не найдены');
+        }
+        
+        if (recentPurchases) {
+            recentPurchases.style.display = 'block';
+            shownCount++;
+            console.log('✅ Последние закупки показаны');
+        } else {
+            console.warn('⚠️ Последние закупки не найдены');
+        }
+        
+        console.log(`Показано секций: ${shownCount}/3`);
+        
+        if (shownCount === 0) {
+            console.error('❌ Ни одна секция домашней вкладки не найдена!');
+            // Создаем базовый контент если ничего не найдено
+            createFallbackHomeContent();
+        }
+    } catch (error) {
+        console.error('❌ Ошибка показа домашнего контента:', error);
+        createFallbackHomeContent();
+    }
 }
 
 // Показ контента поиска
@@ -1989,4 +2054,55 @@ function exportData() {
     a.download = 'zakupki-data.json';
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Создание fallback домашнего контента
+function createFallbackHomeContent() {
+    console.log('Создаем fallback домашний контент');
+    
+    try {
+        const mainContainer = document.querySelector('.main-container');
+        if (!mainContainer) {
+            console.error('❌ Основной контейнер не найден');
+            return;
+        }
+        
+        // Создаем базовую структуру
+        const fallbackContent = document.createElement('div');
+        fallbackContent.className = 'fallback-home-content';
+        fallbackContent.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <h2>🏛️ ГосЗакупки</h2>
+                <p>Добро пожаловать в приложение ГосЗакупки!</p>
+                
+                <div style="margin: 30px 0;">
+                    <button onclick="switchTab('search')" style="padding: 15px 30px; margin: 10px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        🔍 Начать поиск
+                    </button>
+                    <button onclick="switchTab('favorites')" style="padding: 15px 30px; margin: 10px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        ⭐ Избранное
+                    </button>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3>📊 Статистика</h3>
+                    <p>Всего закупок: ${mockPurchases ? mockPurchases.length : 0}</p>
+                    <p>В избранном: ${favorites ? favorites.length : 0}</p>
+                    <p>Подано заявок: ${userApplications ? userApplications.length : 0}</p>
+                </div>
+            </div>
+        `;
+        
+        // Удаляем существующий fallback контент если есть
+        const existingFallback = document.querySelector('.fallback-home-content');
+        if (existingFallback) {
+            existingFallback.remove();
+        }
+        
+        mainContainer.appendChild(fallbackContent);
+        console.log('✅ Fallback домашний контент создан');
+        
+    } catch (error) {
+        console.error('❌ Ошибка создания fallback контента:', error);
+    }
 }
