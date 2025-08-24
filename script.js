@@ -160,47 +160,96 @@ const mockPurchases = [
 document.addEventListener('DOMContentLoaded', function() {
     // Настройка Telegram Web App
     if (tg) {
-        tg.ready();
-        tg.expand();
-        tg.setHeaderColor('#007AFF');
-        tg.setBackgroundColor('#f2f2f7');
+        try {
+            tg.ready();
+            tg.expand();
+            
+            // Проверяем версию API перед использованием методов
+            if (tg.version && parseFloat(tg.version) >= 6.0) {
+                // Для новых версий используем современные методы
+                if (tg.setHeaderColor) {
+                    tg.setHeaderColor('#007AFF');
+                }
+                if (tg.setBackgroundColor) {
+                    tg.setBackgroundColor('#f2f2f7');
+                }
+            } else {
+                // Для старых версий используем альтернативные методы
+                console.log('Используем совместимую версию Telegram Web App API');
+            }
+        } catch (error) {
+            console.warn('Ошибка инициализации Telegram Web App:', error);
+        }
     }
     
     // Инициализация событий
-    initializeEvents();
+    try {
+        initializeEvents();
+        console.log('✅ События инициализированы');
+    } catch (error) {
+        console.error('❌ Ошибка инициализации событий:', error);
+    }
     
     // Загрузка данных
-    loadInitialData();
+    try {
+        loadInitialData();
+        console.log('✅ Данные загружены');
+    } catch (error) {
+        console.error('❌ Ошибка загрузки данных:', error);
+    }
     
     // Инициализация поиска
-    initializeSearch();
+    try {
+        initializeSearch();
+        console.log('✅ Поиск инициализирован');
+    } catch (error) {
+        console.error('❌ Ошибка инициализации поиска:', error);
+    }
 });
 
 // Инициализация событий
 function initializeEvents() {
     // События для элементов меню
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const section = this.dataset.section;
-            handleMenuClick(section);
+    const menuItems = document.querySelectorAll('.menu-item');
+    if (menuItems.length > 0) {
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.dataset.section;
+                handleMenuClick(section);
+            });
         });
-    });
+        console.log(`✅ Добавлено ${menuItems.length} обработчиков для меню`);
+    } else {
+        console.warn('⚠️ Элементы меню не найдены');
+    }
     
     // События для нижней навигации
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const tab = this.dataset.tab;
-            switchTab(tab);
+    const navItems = document.querySelectorAll('.nav-item');
+    if (navItems.length > 0) {
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                switchTab(tab);
+            });
         });
-    });
+        console.log(`✅ Добавлено ${navItems.length} обработчиков для навигации`);
+    } else {
+        console.warn('⚠️ Элементы навигации не найдены');
+    }
     
     // События для кнопок быстрых действий
-    document.querySelectorAll('.action-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const text = this.textContent;
-            handleActionClick(text);
+    const actionBtns = document.querySelectorAll('.action-btn');
+    if (actionBtns.length > 0) {
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const text = this.textContent;
+                handleActionClick(text);
+            });
         });
-    });
+        console.log(`✅ Добавлено ${actionBtns.length} обработчиков для кнопок действий`);
+    } else {
+        console.warn('⚠️ Кнопки действий не найдены');
+    }
     
     // События для модальных окон
     initializeModalEvents();
@@ -1489,27 +1538,49 @@ function loadInitialData() {
         updateStatusBar();
         
         // Загружаем избранное
-        const savedFavorites = localStorage.getItem('zakupki_favorites');
-        if (savedFavorites) {
-            favorites = JSON.parse(savedFavorites);
+        try {
+            const savedFavorites = localStorage.getItem('zakupkiFavorites');
+            if (savedFavorites) {
+                favorites = JSON.parse(savedFavorites);
+                console.log(`✅ Загружено ${favorites.length} избранных закупок`);
+            }
+        } catch (error) {
+            console.warn('⚠️ Ошибка загрузки избранного:', error);
         }
         
         // Загружаем заявки
-        const savedApplications = localStorage.getItem('zakupki_applications');
-        if (savedApplications) {
-            userApplications = JSON.parse(savedApplications);
+        try {
+            const savedApplications = localStorage.getItem('zakupkiApplications');
+            if (savedApplications) {
+                userApplications = JSON.parse(savedApplications);
+                console.log(`✅ Загружено ${userApplications.length} заявок`);
+            }
+        } catch (error) {
+            console.warn('⚠️ Ошибка загрузки заявок:', error);
         }
         
         // Загружаем историю поиска
-        const savedSearchHistory = localStorage.getItem('zakupki_search_history');
-        if (savedSearchHistory) {
-            searchHistory = JSON.parse(savedSearchHistory);
+        try {
+            const savedSearchHistory = localStorage.getItem('zakupkiSearchHistory');
+            if (savedSearchHistory) {
+                searchHistory = JSON.parse(savedSearchHistory);
+                console.log(`✅ Загружено ${searchHistory.length} запросов в истории`);
+            }
+        } catch (error) {
+            console.warn('⚠️ Ошибка загрузки истории поиска:', error);
+            searchHistory = [];
         }
         
         // Загружаем уведомления
-        const savedNotifications = localStorage.getItem('zakupki_notifications');
-        if (savedNotifications) {
-            notifications = JSON.parse(savedNotifications);
+        try {
+            const savedNotifications = localStorage.getItem('zakupkiNotifications');
+            if (savedNotifications) {
+                notifications = JSON.parse(savedNotifications);
+                console.log(`✅ Загружено ${notifications.length} уведомлений`);
+            }
+        } catch (error) {
+            console.warn('⚠️ Ошибка загрузки уведомлений:', error);
+            notifications = [];
         }
         
         // Обновляем отображение последних закупок
