@@ -142,6 +142,15 @@
         .demo-button:active {
             transform: translateY(0);
         }
+        
+        .netlify-info {
+            background: rgba(255, 69, 0, 0.2);
+            border: 1px solid rgba(255, 69, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -195,6 +204,12 @@
                 <div class="status-icon">🖥️</div>
                 <h2>Версия для браузера</h2>
                 <p>Это версия для разработки и тестирования</p>
+            </div>
+
+            <div class="netlify-info">
+                <div class="status-icon">🚀</div>
+                <h2>Развернуто на Netlify</h2>
+                <p>Этот Mini App развернут на надежном хостинге</p>
             </div>
 
             <div class="demo-section">
@@ -287,10 +302,10 @@
                 console.log('Telegram WebApp инициализирован:', tg);
             } else {
                 // Запущено в браузере
-                environmentElement.textContent = 'Браузер';
+                environmentElement.textContent = 'Браузер (Netlify)';
                 telegramContent.style.display = 'none';
                 browserContent.style.display = 'block';
-                console.log('Запущено в браузере');
+                console.log('Запущено в браузере на Netlify');
             }
         };
 
