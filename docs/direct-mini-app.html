@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГосЗакупки - Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .user-info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .features {
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .features h3 {
+            margin-top: 0;
+            color: #e0e7ff;
+        }
+        
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .features li:last-child {
+            border-bottom: none;
+        }
+        
+        .features li:before {
+            content: "✅ ";
+            margin-right: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .browser-info {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .demo-section {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .demo-button {
+            background: linear-gradient(45deg, #0088cc, #00a8ff);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .demo-button:active {
+            transform: translateY(0);
+        }
+        
+        .github-info {
+            background: rgba(255, 69, 0, 0.2);
+            border: 1px solid rgba(255, 69, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ ГосЗакупки</h1>
+            <p>Telegram Mini App для поиска государственных закупок</p>
+        </div>
+
+        <div id="telegram-content" style="display: none;">
+            <div class="status">
+                <div class="status-icon">📱</div>
+                <h2>✅ Запущено в Telegram WebApp!</h2>
+                <p>Ваше приложение успешно работает в Telegram</p>
+            </div>
+
+            <div id="user-info" class="user-info">
+                <h3>👤 Информация о пользователе</h3>
+                <div id="user-details">Загрузка...</div>
+            </div>
+
+            <div class="demo-section">
+                <h3>🎯 Демо функции</h3>
+                <p>Попробуйте интерактивные элементы:</p>
+                <button class="demo-button" onclick="showNotification('🔔 Уведомление о новой закупке!')">
+                    🔔 Тест уведомления
+                </button>
+                <button class="demo-button" onclick="showNotification('⭐ Закупка добавлена в избранное!')">
+                    ⭐ Добавить в избранное
+                </button>
+                <button class="demo-button" onclick="showNotification('🔍 Поиск закупок...')">
+                    🔍 Поиск закупок
+                </button>
+            </div>
+
+            <div class="features">
+                <h3>🎯 Доступные функции</h3>
+                <ul>
+                    <li>🔍 Поиск закупок по регионам</li>
+                    <li>📊 Фильтры по категориям</li>
+                    <li>⭐ Избранные закупки</li>
+                    <li>🔔 Уведомления о новых закупках</li>
+                    <li>📱 Адаптивный интерфейс</li>
+                    <li>🔒 Безопасная авторизация</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="browser-content" style="display: none;">
+            <div class="browser-info">
+                <div class="status-icon">🖥️</div>
+                <h2>Версия для браузера</h2>
+                <p>Это версия для разработки и тестирования</p>
+            </div>
+
+            <div class="github-info">
+                <div class="status-icon">🚀</div>
+                <h2>Развернуто на GitHub Pages</h2>
+                <p>Этот Mini App развернут на GitHub Pages</p>
+            </div>
+
+            <div class="demo-section">
+                <h3>🎯 Демо функции</h3>
+                <p>Попробуйте интерактивные элементы:</p>
+                <button class="demo-button" onclick="showNotification('🔔 Уведомление о новой закупке!')">
+                    🔔 Тест уведомления
+                </button>
+                <button class="demo-button" onclick="showNotification('⭐ Закупка добавлена в избранное!')">
+                    ⭐ Добавить в избранное
+                </button>
+                <button class="demo-button" onclick="showNotification('🔍 Поиск закупок...')">
+                    🔍 Поиск закупок
+                </button>
+            </div>
+
+            <div class="features">
+                <h3>📋 Для тестирования в Telegram:</h3>
+                <ul>
+                    <li>Используйте бота @oborotn_bot</li>
+                    <li>Нажмите кнопку "Открыть ГосЗакупки"</li>
+                    <li>Mini App откроется прямо в Telegram</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Окружение:</strong> <span id="environment">Определяется...</span> | 
+            <strong>Время:</strong> <span id="current-time"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Определяем, запущено ли приложение в Telegram
+        const isTelegramWebApp = () => {
+            return window.Telegram && window.Telegram.WebApp;
+        };
+
+        // Показываем уведомление
+        const showNotification = (message) => {
+            if (isTelegramWebApp()) {
+                // В Telegram используем встроенные уведомления
+                const tg = window.Telegram.WebApp;
+                tg.showAlert(message);
+            } else {
+                // В браузере используем alert
+                alert(message);
+            }
+        };
+
+        // Обновляем время
+        const updateTime = () => {
+            document.getElementById('current-time').textContent = new Date().toLocaleTimeString();
+        };
+
+        // Основная логика
+        const initApp = () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            const telegram = isTelegramWebApp();
+            const environmentElement = document.getElementById('environment');
+            const telegramContent = document.getElementById('telegram-content');
+            const browserContent = document.getElementById('browser-content');
+
+            if (telegram) {
+                // Запущено в Telegram
+                environmentElement.textContent = 'Telegram WebApp';
+                telegramContent.style.display = 'block';
+                browserContent.style.display = 'none';
+
+                // Инициализируем Telegram WebApp
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+
+                // Показываем информацию о пользователе
+                if (tg.initDataUnsafe?.user) {
+                    const user = tg.initDataUnsafe.user;
+                    const userDetails = document.getElementById('user-details');
+                    userDetails.innerHTML = `
+                        <p><strong>Имя:</strong> ${user.firstName || 'Не указано'}</p>
+                        <p><strong>Фамилия:</strong> ${user.lastName || 'Не указана'}</p>
+                        <p><strong>Username:</strong> @${user.username || 'Не указан'}</p>
+                        <p><strong>ID:</strong> ${user.id}</p>
+                    `;
+                    document.getElementById('user-info').style.display = 'block';
+                }
+
+                console.log('Telegram WebApp инициализирован:', tg);
+            } else {
+                // Запущено в браузере
+                environmentElement.textContent = 'Браузер (GitHub Pages)';
+                telegramContent.style.display = 'none';
+                browserContent.style.display = 'block';
+                console.log('Запущено в браузере на GitHub Pages');
+            }
+        };
+
+        // Запускаем приложение после загрузки DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
