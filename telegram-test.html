@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест Telegram WebApp - ГосЗакупки</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: var(--tg-theme-secondary-bg-color, #f3f4f6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--tg-theme-hint-color, #e5e7eb);
+        }
+        
+        .success { 
+            background: var(--tg-theme-button-color, #10b981);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+        
+        .info { 
+            background: var(--tg-theme-button-color, #3b82f6);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+        
+        .warning { 
+            background: var(--tg-theme-button-color, #f59e0b);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+        
+        .button {
+            background: var(--tg-theme-button-color, #3b82f6);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: opacity 0.2s;
+        }
+        
+        .button:hover {
+            opacity: 0.8;
+        }
+        
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .user-info {
+            background: var(--tg-theme-secondary-bg-color, #f3f4f6);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--tg-theme-hint-color, #e5e7eb);
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Тест Telegram WebApp</h1>
+            <p>ГосЗакупки - Проверка функциональности</p>
+        </div>
+        
+        <div id="status" class="status-card info">
+            <h3>📊 Статус загрузки</h3>
+            <p id="statusText">Проверяем Telegram WebApp...</p>
+        </div>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <h3>👤 Информация о пользователе</h3>
+            <div id="userDetails"></div>
+        </div>
+        
+        <div class="status-card">
+            <h3>🎯 Функции приложения</h3>
+            <ul class="feature-list">
+                <li>🔍 Поиск закупок с фильтрами</li>
+                <li>⭐ Избранное и отслеживание</li>
+                <li>🔔 Уведомления о новых закупках</li>
+                <li>📱 Адаптивный дизайн для мобильных</li>
+                <li>🌐 Интеграция с ЕИС и другими источниками</li>
+            </ul>
+        </div>
+        
+        <div class="status-card">
+            <h3>🧪 Тестовые кнопки</h3>
+            <button class="button" onclick="testMainButton()">Показать главную кнопку</button>
+            <button class="button" onclick="testBackButton()">Показать кнопку назад</button>
+            <button class="button" onclick="testExpand()">Развернуть приложение</button>
+            <button class="button" onclick="testClose()">Закрыть приложение</button>
+        </div>
+        
+        <div class="status-card">
+            <h3>📱 Информация о Telegram WebApp</h3>
+            <div id="webappInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        let webApp = null;
+        let user = null;
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            
+            statusText.textContent = message;
+            statusDiv.className = `status-card ${type}`;
+        }
+        
+        function showUserInfo() {
+            const userInfoDiv = document.getElementById('userInfo');
+            const userDetailsDiv = document.getElementById('userDetails');
+            
+            if (user) {
+                userDetailsDiv.innerHTML = `
+                    <p><strong>Имя:</strong> ${user.firstName || 'Не указано'}</p>
+                    <p><strong>Фамилия:</strong> ${user.lastName || 'Не указано'}</p>
+                    <p><strong>Username:</strong> @${user.username || 'Не указано'}</p>
+                    <p><strong>ID:</strong> ${user.id || 'Не указано'}</p>
+                    <p><strong>Язык:</strong> ${user.languageCode || 'Не указано'}</p>
+                `;
+                userInfoDiv.style.display = 'block';
+            }
+        }
+        
+        function showWebAppInfo() {
+            const webappInfoDiv = document.getElementById('webappInfo');
+            
+            if (webApp) {
+                webappInfoDiv.innerHTML = `
+                    <p><strong>Версия:</strong> ${webApp.version || 'Не указано'}</p>
+                    <p><strong>Платформа:</strong> ${webApp.platform || 'Не указано'}</p>
+                    <p><strong>Цветовая схема:</strong> ${webApp.colorScheme || 'Не указано'}</p>
+                    <p><strong>Тема:</strong> ${webApp.themeParams ? 'Настроена' : 'Не настроена'}</p>
+                    <p><strong>Инициализация:</strong> ${webApp.initData ? 'Есть данные' : 'Нет данных'}</p>
+                `;
+            }
+        }
+        
+        function testMainButton() {
+            if (webApp) {
+                webApp.MainButton.setText('Найти закупки');
+                webApp.MainButton.onClick(() => {
+                    alert('Главная кнопка нажата!');
+                });
+                webApp.MainButton.show();
+                updateStatus('Главная кнопка показана', 'success');
+            }
+        }
+        
+        function testBackButton() {
+            if (webApp) {
+                webApp.BackButton.onClick(() => {
+                    alert('Кнопка назад нажата!');
+                });
+                webApp.BackButton.isVisible = true;
+                updateStatus('Кнопка назад показана', 'success');
+            }
+        }
+        
+        function testExpand() {
+            if (webApp) {
+                webApp.expand();
+                updateStatus('Приложение развернуто', 'success');
+            }
+        }
+        
+        function testClose() {
+            if (webApp) {
+                webApp.close();
+            }
+        }
+        
+        // Инициализация
+        function initTelegramWebApp() {
+            console.log('Инициализация Telegram WebApp...');
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                webApp = window.Telegram.WebApp;
+                console.log('Telegram WebApp найден:', webApp);
+                
+                // Инициализация
+                webApp.ready();
+                webApp.expand();
+                
+                // Получение данных пользователя
+                if (webApp.initDataUnsafe && webApp.initDataUnsafe.user) {
+                    user = webApp.initDataUnsafe.user;
+                    console.log('Данные пользователя:', user);
+                    showUserInfo();
+                }
+                
+                // Показ информации о WebApp
+                showWebAppInfo();
+                
+                updateStatus('Telegram WebApp успешно инициализирован!', 'success');
+                
+                // Настройка темы
+                document.documentElement.style.setProperty('--tg-theme-bg-color', webApp.themeParams.bg_color || '#ffffff');
+                document.documentElement.style.setProperty('--tg-theme-text-color', webApp.themeParams.text_color || '#000000');
+                document.documentElement.style.setProperty('--tg-theme-button-color', webApp.themeParams.button_color || '#3b82f6');
+                document.documentElement.style.setProperty('--tg-theme-button-text-color', webApp.themeParams.button_text_color || '#ffffff');
+                document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', webApp.themeParams.secondary_bg_color || '#f3f4f6');
+                document.documentElement.style.setProperty('--tg-theme-hint-color', webApp.themeParams.hint_color || '#9ca3af');
+                
+            } else {
+                console.log('Telegram WebApp не найден, запуск в режиме браузера');
+                updateStatus('Запущено в браузере (не в Telegram)', 'warning');
+                
+                // Создаем моковые данные для тестирования
+                webApp = {
+                    MainButton: {
+                        setText: (text) => console.log('MainButton.setText:', text),
+                        onClick: (callback) => console.log('MainButton.onClick установлен'),
+                        show: () => console.log('MainButton показана'),
+                        hide: () => console.log('MainButton скрыта')
+                    },
+                    BackButton: {
+                        onClick: (callback) => console.log('BackButton.onClick установлен'),
+                        isVisible: false
+                    },
+                    expand: () => console.log('Приложение развернуто'),
+                    close: () => console.log('Приложение закрыто'),
+                    ready: () => console.log('Приложение готово'),
+                    version: '6.9+',
+                    platform: 'browser',
+                    colorScheme: 'light',
+                    themeParams: {},
+                    initData: '',
+                    initDataUnsafe: {}
+                };
+                
+                showWebAppInfo();
+            }
+        }
+        
+        // Запуск при загрузке страницы
+        document.addEventListener('DOMContentLoaded', initTelegramWebApp);
+        
+        // Также проверяем при загрузке Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            initTelegramWebApp();
+        }
+    </script>
+</body>
+</html>

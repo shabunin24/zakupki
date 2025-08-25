@@ -117,3 +117,12 @@ export interface TelegramWebApp {
   expand: () => void
   close: () => void
 }
+
+// Глобальные типы для Telegram WebApp
+declare global {
+  interface Window {
+    Telegram: {
+      WebApp: TelegramWebApp
+    }
+  }
+}

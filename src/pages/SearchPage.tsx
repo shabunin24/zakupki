@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, X, ChevronDown } from 'lucide-react'
+import { Search, Filter, X } from 'lucide-react'
 import { usePurchase } from '../contexts/PurchaseContext'
 import PurchaseCard from '../components/PurchaseCard'
 import { SearchFilters, PurchaseStatus, ProcurementMethod } from '../types'
 
 const SearchPage: React.FC = () => {
-  const { state, dispatch } = usePurchase()
+  const { state } = usePurchase()
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<SearchFilters>({})

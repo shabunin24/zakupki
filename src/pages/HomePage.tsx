@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Filter, TrendingUp, Clock, Star } from 'lucide-react'
+import { Search, TrendingUp, Clock, Star } from 'lucide-react'
 import { usePurchase } from '../contexts/PurchaseContext'
 import PurchaseCard from '../components/PurchaseCard'
 import { Purchase } from '../types'

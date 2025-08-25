@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест React без Vite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Тест React без Vite</h1>
+        
+        <div id="status">
+            <div class="status info">Проверяем загрузку...</div>
+        </div>
+        
+        <div id="root">
+            <div class="status error">React не загрузился</div>
+        </div>
+        
+        <div class="status info">
+            <h3>Инструкции:</h3>
+            <ol>
+                <li>Откройте консоль разработчика (F12)</li>
+                <li>Посмотрите на ошибки в консоли</li>
+                <li>Сравните с результатом в Vite версии</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        console.log('HTML страница загружена');
+        
+        // Проверяем наличие элемента root
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+            console.log('✅ Элемент root найден');
+        } else {
+            console.log('❌ Элемент root не найден');
+        }
+        
+        // Простая проверка React
+        setTimeout(() => {
+            const statusDiv = document.getElementById('status');
+            if (rootElement && rootElement.innerHTML.includes('React не загрузился')) {
+                statusDiv.innerHTML = '<div class="status error">❌ React не загрузился</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status success">✅ React загрузился успешно</div>';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

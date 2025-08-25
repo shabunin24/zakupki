@@ -4,12 +4,12 @@ import { usePurchase } from '../contexts/PurchaseContext'
 import PurchaseCard from '../components/PurchaseCard'
 
 const FavoritesPage: React.FC = () => {
-  const { getFavoritePurchases, state } = usePurchase()
+  const { getFavoritePurchases } = usePurchase()
   const favoritePurchases = getFavoritePurchases()
 
   const handleRemoveAllFavorites = () => {
     // В реальном приложении здесь будет API вызов
-    favoritePurchases.forEach(purchase => {
+    favoritePurchases.forEach(() => {
       // dispatch({ type: 'TOGGLE_FAVORITE', payload: purchase.id })
     })
   }
