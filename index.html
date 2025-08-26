@@ -9,10 +9,84 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="assets/index-VISo2Of2.js"></script>
-    <link rel="stylesheet" crossorigin href="assets/index-CQC259Pw.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .redirect-button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .redirect-button:hover {
+            transform: translateY(-2px);
+        }
+        .loading {
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div class="container">
+        <div class="logo">🔍</div>
+        <div class="title">ГосЗакупки</div>
+        <div class="subtitle">Telegram Mini App для поиска государственных закупок</div>
+        <a href="search.html" class="redirect-button">🚀 Открыть поиск закупок</a>
+        <div class="loading">
+            <p>Перенаправление на страницу поиска...</p>
+        </div>
+    </div>
+
+    <script>
+        // Автоматическое перенаправление через 3 секунды
+        setTimeout(() => {
+            window.location.href = 'search.html';
+        }, 3000);
+
+        // Инициализация Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
+    </script>
   </body>
 </html>

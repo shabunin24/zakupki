@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск закупок - ГосЗакупки</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .search-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .search-button:hover {
+            transform: translateY(-2px);
+        }
+        .results {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            color: #333;
+            min-height: 200px;
+        }
+        .example-queries {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        .example-queries h3 {
+            margin-top: 0;
+        }
+        .example-query {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .example-query:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .result-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .result-details {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Поиск закупок</h1>
+            <p>Найдите интересующие вас государственные закупки</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="Введите ваш запрос (например: бумага А4 офисная Москва до 200 тыс руб)">
+            <button onclick="performSearch()" class="search-button">🔍 Найти закупки</button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="loading">
+                <p>Введите запрос для поиска закупок</p>
+            </div>
+        </div>
+
+        <div class="example-queries">
+            <h3>💡 Примеры запросов:</h3>
+            <div class="example-query" onclick="setQuery('бумага А4 офисная Москва до 200 тыс руб')">
+                📄 Бумага А4 офисная Москва до 200 тыс руб
+            </div>
+            <div class="example-query" onclick="setQuery('услуги по строительству дорог Крым от 5 до 20 млн')">
+                🏗️ Услуги по строительству дорог Крым от 5 до 20 млн
+            </div>
+            <div class="example-query" onclick="setQuery('поставка медоборудования Москва конкурс')">
+                🏥 Поставка медоборудования Москва конкурс
+            </div>
+            <div class="example-query" onclick="setQuery('электромонтажные работы до 3 млн руб Санкт-Петербург')">
+                ⚡ Электромонтажные работы до 3 млн руб Санкт-Петербург
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем поисковый запрос из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search');
+        
+        if (searchQuery) {
+            document.getElementById('searchInput').value = searchQuery;
+            performSearch();
+        }
+
+        function setQuery(query) {
+            document.getElementById('searchInput').value = query;
+            performSearch();
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                showResults('Введите запрос для поиска');
+                return;
+            }
+
+            showLoading();
+            
+            // Имитируем поиск (в реальном приложении здесь будет API)
+            setTimeout(() => {
+                const mockResults = generateMockResults(query);
+                showResults(mockResults);
+            }, 1500);
+        }
+
+        function showLoading() {
+            document.getElementById('results').innerHTML = `
+                <div class="loading">
+                    <p>🔍 Ищем закупки...</p>
+                    <p>Обрабатываем ваш запрос: "${document.getElementById('searchInput').value}"</p>
+                </div>
+            `;
+        }
+
+        function generateMockResults(query) {
+            const results = [];
+            
+            // Генерируем моковые результаты на основе запроса
+            if (query.toLowerCase().includes('бумага') || query.toLowerCase().includes('канцелярия')) {
+                results.push({
+                    title: 'Поставка канцелярских товаров для офиса',
+                    price: '150,000 руб',
+                    region: 'Москва',
+                    method: 'Электронный аукцион',
+                    status: 'Прием заявок'
+                });
+                results.push({
+                    title: 'Закупка бумаги А4 офисной',
+                    price: '85,000 руб',
+                    region: 'Москва',
+                    method: 'Запрос котировок',
+                    status: 'Прием заявок'
+                });
+            } else if (query.toLowerCase().includes('строительство') || query.toLowerCase().includes('дорог')) {
+                results.push({
+                    title: 'Строительство автомобильной дороги',
+                    price: '15,000,000 руб',
+                    region: 'Крым',
+                    method: 'Конкурс',
+                    status: 'Прием заявок'
+                });
+                results.push({
+                    title: 'Ремонт дорожного покрытия',
+                    price: '8,500,000 руб',
+                    region: 'Крым',
+                    method: 'Электронный аукцион',
+                    status: 'Прием заявок'
+                });
+            } else if (query.toLowerCase().includes('медицин') || query.toLowerCase().includes('медоборудование')) {
+                results.push({
+                    title: 'Поставка медицинского оборудования',
+                    price: '2,500,000 руб',
+                    region: 'Москва',
+                    method: 'Конкурс',
+                    status: 'Прием заявок'
+                });
+            } else {
+                results.push({
+                    title: 'Услуги по вашему запросу',
+                    price: 'По запросу',
+                    region: 'Уточняется',
+                    method: 'Уточняется',
+                    status: 'Прием заявок'
+                });
+            }
+
+            return results;
+        }
+
+        function showResults(results) {
+            if (typeof results === 'string') {
+                document.getElementById('results').innerHTML = `
+                    <div class="no-results">
+                        <p>${results}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<h3>📊 Результаты поиска:</h3>';
+            
+            if (results.length === 0) {
+                html += '<div class="no-results"><p>Закупки не найдены. Попробуйте изменить запрос.</p></div>';
+            } else {
+                results.forEach(result => {
+                    html += `
+                        <div class="result-item">
+                            <div class="result-title">${result.title}</div>
+                            <div class="result-details">
+                                💰 Цена: ${result.price} | 
+                                📍 Регион: ${result.region} | 
+                                🏛️ Метод: ${result.method} | 
+                                📋 Статус: ${result.status}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        // Обработка Enter в поле поиска
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>

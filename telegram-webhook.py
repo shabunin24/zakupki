@@ -2,7 +2,7 @@
 """
 Telegram Webhook сервер для бота ГосЗакупки
 Обрабатывает сообщения и показывает Mini App
-Интегрирован с UniversalProcureSearch API
+Интегрирован с GitHub Pages
 """
 
 import json
@@ -19,28 +19,11 @@ BOT_TOKEN = "8203311811:AAEbVoeZ0inIO7CUFuGUbwNRdoL2xfpxfPw"
 BOT_USERNAME = "oborotn_bot"
 API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-# Конфигурация API поиска
-PROCURE_API_URL = "http://localhost:8000"
+# GitHub Pages URL
+GITHUB_PAGES_URL = "https://shabunin24.github.io/zakupki"
 
 # Создаем Flask приложение
 app = Flask(__name__)
-
-def search_procurements(query, limit=10):
-    """Поиск закупок через UniversalProcureSearch API"""
-    try:
-        response = requests.post(
-            f"{PROCURE_API_URL}/search",
-            json={"q": query, "limit": limit},
-            timeout=10
-        )
-        if response.status_code == 200:
-            return response.json()
-        else:
-            logger.error(f"API вернул код: {response.status_code}")
-            return None
-    except Exception as e:
-        logger.error(f"Ошибка поиска закупок: {e}")
-        return None
 
 def send_telegram_message(chat_id, text, reply_markup=None):
     """Отправляет сообщение в Telegram"""
@@ -69,7 +52,7 @@ def create_mini_app_keyboard():
                 {
                     "text": "🚀 Открыть ГосЗакупки",
                     "web_app": {
-                        "url": "https://shabunin24.github.io/zakupki/"  # GitHub Pages
+                        "url": f"{GITHUB_PAGES_URL}/"
                     }
                 }
             ],
@@ -172,80 +155,37 @@ def handle_start_command(chat_id, user_info):
 
 def handle_search_query(chat_id, query):
     """Обрабатывает поисковый запрос"""
-    # Сначала показываем "ищем..."
-    send_telegram_message(chat_id, "🔍 <b>Ищем закупки...</b>\n\n<i>Обрабатываем ваш запрос...</i>")
+    # Формируем ответ с ссылкой на поиск
+    response_text = f"🔍 <b>Поиск закупок:</b> <i>'{query}'</i>\n\n"
+    response_text += "📱 <b>Откройте приложение для поиска с вашим запросом</b>\n\n"
+    response_text += "💡 <b>Приложение автоматически:</b>\n"
+    response_text += "• Поймет ваш запрос на естественном языке\n"
+    response_text += "• Определит категорию товаров/услуг\n"
+    response_text += "• Найдет подходящие регионы\n"
+    response_text += "• Покажет ценовые диапазоны\n"
+    response_text += "• Отфильтрует по методам закупок"
     
-    # Выполняем поиск
-    results = search_procurements(query, limit=5)
+    # Создаем клавиатуру для открытия приложения с поиском
+    keyboard = {
+        "inline_keyboard": [
+            [
+                {
+                    "text": "🚀 Открыть поиск",
+                    "web_app": {
+                        "url": f"{GITHUB_PAGES_URL}/?search={query}"
+                    }
+                }
+            ],
+            [
+                {
+                    "text": "🔍 Новый поиск",
+                    "callback_data": "search"
+                }
+            ]
+        ]
+    }
     
-    if results and results.get("total", 0) > 0:
-        # Формируем ответ с результатами
-        response_text = f"🔍 <b>Результаты поиска:</b> <i>'{query}'</i>\n\n"
-        response_text += f"📊 Найдено: {results['total']} закупок\n\n"
-        
-        # Показываем фильтры
-        filters = results.get("filters", {})
-        if filters.get("region"):
-            response_text += f"📍 Регион: {', '.join(filters['region'])}\n"
-        if filters.get("price_max"):
-            response_text += f"💰 До: {filters['price_max']:,} руб\n"
-        if filters.get("method"):
-            response_text += f"🏛️ Метод: {', '.join(filters['method'])}\n"
-        
-        response_text += "\n📱 <b>Откройте приложение для просмотра всех результатов</b>"
-        
-        # Создаем клавиатуру для открытия приложения
-        keyboard = {
-            "inline_keyboard": [
-                [
-                    {
-                        "text": "🚀 Открыть результаты",
-                        "web_app": {
-                            "url": f"https://shabunin24.github.io/zakupki/?search={query}"
-                        }
-                    }
-                ],
-                [
-                    {
-                        "text": "🔍 Новый поиск",
-                        "callback_data": "search"
-                    }
-                ]
-            ]
-        }
-        
-        send_telegram_message(chat_id, response_text, keyboard)
-        
-    else:
-        # Ничего не найдено
-        response_text = f"🔍 <b>Поиск:</b> <i>'{query}'</i>\n\n"
-        response_text += "❌ <b>Закупки не найдены</b>\n\n"
-        response_text += "💡 <b>Попробуйте:</b>\n"
-        response_text += "• Изменить формулировку запроса\n"
-        response_text += "• Убрать ограничения по региону\n"
-        response_text += "• Изменить ценовой диапазон\n\n"
-        response_text += "📱 <b>Или откройте приложение для расширенного поиска</b>"
-        
-        keyboard = {
-            "inline_keyboard": [
-                [
-                    {
-                        "text": "🚀 Открыть приложение",
-                        "web_app": {
-                            "url": "https://shabunin24.github.io/zakupki/"
-                        }
-                    }
-                ],
-                [
-                    {
-                        "text": "🔍 Новый поиск",
-                        "callback_data": "search"
-                    }
-                ]
-            ]
-        }
-        
-        send_telegram_message(chat_id, response_text, keyboard)
+    send_telegram_message(chat_id, response_text, keyboard)
 
 def handle_callback_query(callback_query):
     """Обрабатывает нажатия на inline кнопки"""
@@ -306,7 +246,7 @@ def handle_callback_query(callback_query):
                     {
                         "text": "🚀 Открыть избранное",
                         "web_app": {
-                            "url": "https://shabunin24.github.io/zakupki/favorites"
+                            "url": f"{GITHUB_PAGES_URL}/favorites"
                         }
                     }
                 ],
@@ -349,7 +289,7 @@ def handle_callback_query(callback_query):
                     {
                         "text": "🚀 Открыть приложение",
                         "web_app": {
-                            "url": "https://shabunin24.github.io/zakupki/"
+                            "url": f"{GITHUB_PAGES_URL}/"
                         }
                     }
                 ],
@@ -406,7 +346,7 @@ def health_check():
     return jsonify({
         "status": "healthy", 
         "bot": BOT_USERNAME,
-        "procure_api": PROCURE_API_URL
+        "github_pages": GITHUB_PAGES_URL
     })
 
 def set_webhook(url):
@@ -473,10 +413,10 @@ if __name__ == "__main__":
     
     print(f"🤖 Бот: @{bot_info['username']} ({bot_info['first_name']})")
     print(f"🔗 API: {API_BASE}")
-    print(f"🔍 Поиск API: {PROCURE_API_URL}")
+    print(f"🌐 GitHub Pages: {GITHUB_PAGES_URL}")
     
     # Запускаем сервер
     print("🚀 Запуск webhook сервера...")
     print("📱 Отправьте /start вашему боту для тестирования")
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
