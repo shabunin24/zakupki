@@ -535,26 +535,86 @@
             // Show loading state
             showLoadingState();
             
-            // Use simulation directly for now
-            console.log('Starting search simulation for:', query);
+            console.log('Starting search for:', query);
             
+            // Simple and reliable search
             setTimeout(() => {
                 try {
-                    const results = generateRealisticResults(query);
+                    // Generate simple results based on query
+                    const results = generateSimpleResults(query);
                     console.log('Generated results:', results.length);
                     showSearchResults(results, query, false);
                 } catch (error) {
                     console.error('Search failed:', error);
-                    // Fallback to basic mock data
+                    // Always fallback to mock data
                     const filtered = mockPurchases.filter(purchase => 
                         purchase.title.toLowerCase().includes(query.toLowerCase()) ||
                         purchase.description.toLowerCase().includes(query.toLowerCase()) ||
                         purchase.region.toLowerCase().includes(query.toLowerCase()) ||
                         purchase.customer.toLowerCase().includes(query.toLowerCase())
                     );
+                    console.log('Fallback results:', filtered.length);
                     showSearchResults(filtered, query, false);
                 }
             }, 1000);
+        }
+        
+        function generateSimpleResults(query) {
+            const results = [];
+            const queryLower = query.toLowerCase();
+            
+            console.log('Generating results for query:', queryLower);
+            
+            // Simple keyword matching
+            if (queryLower.includes('бумага') || queryLower.includes('канц') || queryLower.includes('офис')) {
+                console.log('Office supplies category detected');
+                for (let i = 1; i <= 15; i++) {
+                    results.push({
+                        id: `office_${i}`,
+                        title: `Поставка канцелярских товаров ${i}`,
+                        status: 'Опубликовано',
+                        price: Math.floor(Math.random() * 1000000) + 100000,
+                        region: 'Москва',
+                        customer: 'Департамент образования',
+                        deadline: '2024-12-31',
+                        method: 'Электронный аукцион',
+                        description: 'Поставка бумаги, ручек, карандашей'
+                    });
+                }
+            } else if (queryLower.includes('строитель') || queryLower.includes('дорог') || queryLower.includes('ремонт')) {
+                console.log('Construction category detected');
+                for (let i = 1; i <= 20; i++) {
+                    results.push({
+                        id: `construction_${i}`,
+                        title: `Строительные работы ${i}`,
+                        status: 'Подача заявок',
+                        price: Math.floor(Math.random() * 10000000) + 1000000,
+                        region: 'Краснодарский край',
+                        customer: 'Министерство транспорта',
+                        deadline: '2024-11-15',
+                        method: 'Открытый конкурс',
+                        description: 'Строительство и ремонт дорог'
+                    });
+                }
+            } else {
+                console.log('Generic category detected');
+                for (let i = 1; i <= 25; i++) {
+                    results.push({
+                        id: `generic_${i}`,
+                        title: `Закупка ${query} ${i}`,
+                        status: 'Опубликовано',
+                        price: Math.floor(Math.random() * 500000) + 50000,
+                        region: 'Санкт-Петербург',
+                        customer: 'Администрация города',
+                        deadline: '2024-10-20',
+                        method: 'Запрос котировок',
+                        description: `Поставка товаров и услуг по запросу: ${query}`
+                    });
+                }
+            }
+            
+            console.log('Generated results count:', results.length);
+            return results;
         }
         
         async function searchRealZakupki(query) {
@@ -836,30 +896,68 @@
         }
         
         function showSearchResults(purchases, query, isRealData = false) {
+            console.log('showSearchResults called with:', {purchases, query, isRealData});
+            console.log('Purchases count:', purchases ? purchases.length : 'undefined');
+            
+            if (!purchases || purchases.length === 0) {
+                console.log('No purchases to show, displaying empty state');
+                const searchSection = document.querySelector('.search-section');
+                searchSection.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
+                        <h3 style="color: #1e293b; margin-bottom: 10px;">Закупки не найдены</h3>
+                        <p style="color: #64748b;">По запросу "${query}" ничего не найдено</p>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 20px;">
+                            Попробуйте изменить запрос или использовать другие ключевые слова
+                        </p>
+                        <button onclick="showSearchForm()" style="
+                            background: #3b82f6;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            margin-top: 20px;
+                        ">
+                            ← Новый поиск
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
             // Create results section
             const resultsHTML = createResultsHTML(purchases, query, isRealData);
+            console.log('Results HTML created, length:', resultsHTML.length);
             
             // Replace search section with results
             const searchSection = document.querySelector('.search-section');
-            searchSection.innerHTML = resultsHTML;
-            
-            // Add back button
-            const backButton = document.createElement('div');
-            backButton.innerHTML = `
-                <button onclick="showSearchForm()" style="
-                    background: #3b82f6;
-                    color: white;
-                    border: none;
-                    padding: 12px 24px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    margin-top: 20px;
-                ">
-                    ← Новый поиск
-                </button>
-            `;
-            searchSection.appendChild(backButton);
+            if (searchSection) {
+                searchSection.innerHTML = resultsHTML;
+                console.log('Search section updated with results');
+                
+                // Add back button
+                const backButton = document.createElement('div');
+                backButton.innerHTML = `
+                    <button onclick="showSearchForm()" style="
+                        background: #3b82f6;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        margin-top: 20px;
+                    ">
+                        ← Новый поиск
+                    </button>
+                `;
+                searchSection.appendChild(backButton);
+                console.log('Back button added');
+            } else {
+                console.error('Search section not found!');
+            }
         }
         
         function createResultsHTML(purchases, query, isRealData = false) {
