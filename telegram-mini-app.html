@@ -535,13 +535,17 @@
             // Show loading state
             showLoadingState();
             
-            // Try to search on real zakupki.gov.ru first
-            searchRealZakupki(query).then(realResults => {
-                if (realResults && realResults.length > 0) {
-                    showSearchResults(realResults, query, true);
-                } else {
-                    // Fallback to mock data if real search fails
-                    console.log('Real search failed, using mock data');
+            // Use simulation directly for now
+            console.log('Starting search simulation for:', query);
+            
+            setTimeout(() => {
+                try {
+                    const results = generateRealisticResults(query);
+                    console.log('Generated results:', results.length);
+                    showSearchResults(results, query, false);
+                } catch (error) {
+                    console.error('Search failed:', error);
+                    // Fallback to basic mock data
                     const filtered = mockPurchases.filter(purchase => 
                         purchase.title.toLowerCase().includes(query.toLowerCase()) ||
                         purchase.description.toLowerCase().includes(query.toLowerCase()) ||
@@ -550,35 +554,18 @@
                     );
                     showSearchResults(filtered, query, false);
                 }
-            }).catch(error => {
-                console.error('Real search error:', error);
-                // Fallback to mock data
-                const filtered = mockPurchases.filter(purchase => 
-                    purchase.title.toLowerCase().includes(query.toLowerCase()) ||
-                    purchase.description.toLowerCase().includes(query.toLowerCase()) ||
-                    purchase.region.toLowerCase().includes(query.toLowerCase()) ||
-                    purchase.customer.toLowerCase().includes(query.toLowerCase())
-                );
-                showSearchResults(filtered, query, false);
-            });
+            }, 1000);
         }
         
         async function searchRealZakupki(query) {
             try {
-                // Try to fetch from our backend API first
-                const response = await fetch(`https://shabunin24.github.io/zakupki/api/search?q=${encodeURIComponent(query)}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    return data.purchases || [];
-                }
-                
-                // If backend fails, try direct search simulation
+                // Skip API call for now since it doesn't exist
+                console.log('Skipping API call, using simulation directly');
                 return await simulateZakupkiSearch(query);
-                
             } catch (error) {
-                console.error('API search failed:', error);
-                // Fallback to simulation
-                return await simulateZakupkiSearch(query);
+                console.error('Search simulation failed:', error);
+                // Return empty array as fallback
+                return [];
             }
         }
         
@@ -1121,38 +1108,13 @@
 
         function showNotification(message) {
             try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    const tg = window.Telegram.WebApp;
-                    
-                    // Try different notification methods based on version
-                    if (tg.showPopup && typeof tg.showPopup === 'function') {
-                        // Use showPopup if available
-                        tg.showPopup({
-                            title: 'Уведомление',
-                            message: message,
-                            buttons: [{text: 'OK', type: 'ok'}]
-                        });
-                    } else if (tg.showAlert && typeof tg.showAlert === 'function') {
-                        // Use showAlert if available
-                        tg.showAlert(message);
-                    } else if (tg.MainButton && tg.MainButton.show) {
-                        // Use MainButton as fallback
-                        tg.MainButton.text = message;
-                        tg.MainButton.show();
-                        setTimeout(() => tg.MainButton.hide(), 3000);
-                    } else {
-                        // Fallback to browser alert
-                        console.log('Telegram notification:', message);
-                        showBrowserNotification(message);
-                    }
-                } else {
-                    // Use browser notification
-                    showBrowserNotification(message);
-                }
-            } catch (error) {
-                console.log('Telegram notification failed:', error);
-                // Fallback to browser notification
+                // Always use browser notification for now to avoid WebApp errors
+                console.log('Showing notification:', message);
                 showBrowserNotification(message);
+            } catch (error) {
+                console.log('Notification failed:', error);
+                // Last resort: console log
+                console.log('NOTIFICATION:', message);
             }
         }
         
