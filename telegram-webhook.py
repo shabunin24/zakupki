@@ -52,7 +52,7 @@ def create_mini_app_keyboard():
                 {
                     "text": "🚀 Открыть ГосЗакупки",
                     "web_app": {
-                        "url": f"{GITHUB_PAGES_URL}/"
+                        "url": f"{GITHUB_PAGES_URL}/telegram-mini-app.html"
                     }
                 }
             ],
@@ -172,7 +172,7 @@ def handle_search_query(chat_id, query):
                 {
                     "text": "🚀 Открыть поиск",
                     "web_app": {
-                        "url": f"{GITHUB_PAGES_URL}/?search={query}"
+                        "url": f"{GITHUB_PAGES_URL}/index.html?search={query}"
                     }
                 }
             ],
