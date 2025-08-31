@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГосЗакупки - Debug версия</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .search-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .search-button:hover {
+            background: #2563eb;
+        }
+        .results {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .result-item {
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .debug-info {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ ГосЗакупки - Debug</h1>
+            <p>Поиск государственных закупок по всей России</p>
+        </div>
+        
+        <div class="search-box">
+            <h3>🔍 Поиск закупок</h3>
+            <input type="text" class="search-input" id="searchInput" placeholder="Введите запрос (например: бумага, строительство)">
+            <button class="search-button" onclick="debugSearch()">🔍 Найти закупки</button>
+        </div>
+        
+        <div class="results" id="results">
+            <p>Результаты поиска появятся здесь...</p>
+        </div>
+        
+        <div class="debug-info" id="debugInfo">
+            <strong>Debug информация:</strong><br>
+            Страница загружена: <span id="loadTime">-</span><br>
+            Поисков выполнено: <span id="searchCount">0</span><br>
+            Последний запрос: <span id="lastQuery">-</span><br>
+            Последний результат: <span id="lastResult">-</span><br>
+            Telegram статус: <span id="telegramStatus">-</span>
+        </div>
+    </div>
+
+    <script>
+        // Простая функция поиска с максимальным логированием
+        function debugSearch() {
+            console.log('=== DEBUG ПОИСК ЗАПУЩЕН ===');
+            
+            // Проверяем все элементы
+            const searchInput = document.getElementById('searchInput');
+            const results = document.getElementById('results');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            console.log('Элементы найдены:', {
+                searchInput: !!searchInput,
+                results: !!results,
+                debugInfo: !!debugInfo
+            });
+            
+            if (!searchInput) {
+                console.error('Поле поиска не найдено!');
+                alert('ОШИБКА: Поле поиска не найдено!');
+                return;
+            }
+            
+            const query = searchInput.value.trim();
+            console.log('Запрос:', query);
+            
+            if (!query) {
+                alert('Введите запрос для поиска!');
+                return;
+            }
+            
+            // Обновляем debug информацию
+            document.getElementById('lastQuery').textContent = query;
+            const searchCount = parseInt(document.getElementById('searchCount').textContent) + 1;
+            document.getElementById('searchCount').textContent = searchCount;
+            
+            // Показываем loading
+            results.innerHTML = '<p>🔍 Ищем закупки по запросу: "' + query + '"...</p>';
+            console.log('Loading состояние показано');
+            
+            // Имитируем поиск
+            setTimeout(() => {
+                console.log('Генерируем результаты...');
+                const searchResults = generateDebugResults(query);
+                console.log('Результатов сгенерировано:', searchResults.length);
+                showDebugResults(searchResults, query);
+            }, 1000);
+        }
+        
+        function generateDebugResults(query) {
+            console.log('generateDebugResults вызвана с запросом:', query);
+            
+            const results = [];
+            const queryLower = query.toLowerCase();
+            
+            console.log('Анализируем запрос:', queryLower);
+            
+            if (queryLower.includes('бумага') || queryLower.includes('канц')) {
+                console.log('Категория: Канцелярские товары');
+                for (let i = 1; i <= 3; i++) {
+                    results.push({
+                        title: `Поставка канцелярских товаров ${i}`,
+                        price: Math.floor(Math.random() * 1000000) + 100000,
+                        region: 'Москва',
+                        status: 'Опубликовано'
+                    });
+                }
+            } else if (queryLower.includes('строитель')) {
+                console.log('Категория: Строительство');
+                for (let i = 1; i <= 3; i++) {
+                    results.push({
+                        title: `Строительные работы ${i}`,
+                        price: Math.floor(Math.random() * 10000000) + 1000000,
+                        region: 'Краснодарский край',
+                        status: 'Подача заявок'
+                    });
+                }
+            } else {
+                console.log('Категория: Общие закупки');
+                for (let i = 1; i <= 3; i++) {
+                    results.push({
+                        title: `Закупка ${query} ${i}`,
+                        price: Math.floor(Math.random() * 500000) + 50000,
+                        region: 'Санкт-Петербург',
+                        status: 'Опубликовано'
+                    });
+                }
+            }
+            
+            console.log('Результатов в массиве:', results.length);
+            return results;
+        }
+        
+        function showDebugResults(results, query) {
+            console.log('showDebugResults вызвана с результатами:', results.length);
+            
+            let html = `<h3>🔍 Результаты поиска: "${query}"</h3>`;
+            html += `<p>Найдено закупок: ${results.length}</p>`;
+            
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <h4>${result.title}</h4>
+                        <p><strong>Цена:</strong> ${result.price.toLocaleString()} ₽</p>
+                        <p><strong>Регион:</strong> ${result.region}</p>
+                        <p><strong>Статус:</strong> ${result.status}</p>
+                    </div>
+                `;
+            });
+            
+            const resultsElement = document.getElementById('results');
+            if (resultsElement) {
+                resultsElement.innerHTML = html;
+                console.log('Результаты отображены на странице');
+            } else {
+                console.error('Элемент results не найден!');
+            }
+            
+            document.getElementById('lastResult').textContent = `${results.length} результатов`;
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOMContentLoaded СРАБОТАЛ ===');
+            console.log('Инициализируем страницу...');
+            
+            // Обновляем время загрузки
+            const loadTimeElement = document.getElementById('loadTime');
+            if (loadTimeElement) {
+                loadTimeElement.textContent = new Date().toLocaleString();
+                console.log('Время загрузки обновлено');
+            }
+            
+            // Проверяем Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                console.log('Telegram WebApp обнаружен:', {
+                    version: tg.version,
+                    platform: tg.platform
+                });
+                document.getElementById('telegramStatus').textContent = `Да, версия ${tg.version}`;
+            } else {
+                console.log('Telegram WebApp не обнаружен');
+                document.getElementById('telegramStatus').textContent = 'Нет';
+            }
+            
+            // Автоматический поиск при Enter
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        console.log('Enter нажат, запускаем поиск');
+                        debugSearch();
+                    }
+                });
+                console.log('Event listener для Enter подключен');
+            }
+            
+            console.log('=== ИНИЦИАЛИЗАЦИЯ ЗАВЕРШЕНА ===');
+            console.log('Поиск готов к работе!');
+        });
+        
+        // Дополнительная проверка при загрузке
+        window.addEventListener('load', function() {
+            console.log('=== WINDOW LOAD СРАБОТАЛ ===');
+            console.log('Все ресурсы загружены');
+        });
+        
+        // Проверка ошибок
+        window.addEventListener('error', function(e) {
+            console.error('ОШИБКА JavaScript:', e.error);
+            console.error('Файл:', e.filename);
+            console.error('Строка:', e.lineno);
+        });
+    </script>
+</body>
+</html>
