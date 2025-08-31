@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ГосЗакупки - Поиск государственных закупок</title>
+    <title>Избранные закупки - ГосЗакупки</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -29,7 +29,7 @@
         .header {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             color: white;
-            padding: 30px 0;
+            padding: 20px 0;
             margin: -20px -20px 30px -20px;
             border-radius: 0 0 20px 20px;
         }
@@ -44,7 +44,33 @@
         }
         
         .header-left {
-            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
         }
         
         .header-actions {
@@ -61,79 +87,46 @@
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .action-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
         
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-        
-        /* Search Section */
-        .search-section {
+        /* Stats Section */
+        .stats-section {
             background: white;
             border-radius: 16px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
         
-        .search-form {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
         
-        .search-input {
-            flex: 1;
-            min-width: 300px;
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+        .stat-card {
+            text-align: center;
+            padding: 20px;
             background: #f8fafc;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .search-button {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
             border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+            border: 1px solid #e2e8f0;
         }
         
-        .search-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
         }
         
         /* Filters */
@@ -158,27 +151,10 @@
             color: #1e293b;
         }
         
-        .filters-toggle {
-            background: #f1f5f9;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #64748b;
-            transition: all 0.3s ease;
-        }
-        
-        .filters-toggle:hover {
-            background: #e2e8f0;
-            color: #475569;
-        }
-        
         .filters-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 20px;
         }
         
         .filter-group {
@@ -193,7 +169,7 @@
             margin-bottom: 8px;
         }
         
-        .filter-select, .filter-input {
+        .filter-select {
             padding: 12px 16px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
@@ -202,7 +178,7 @@
             transition: border-color 0.3s ease;
         }
         
-        .filter-select:focus, .filter-input:focus {
+        .filter-select:focus {
             outline: none;
             border-color: #3b82f6;
         }
@@ -211,6 +187,7 @@
             display: flex;
             gap: 15px;
             justify-content: flex-end;
+            margin-top: 20px;
         }
         
         .filter-button {
@@ -296,6 +273,7 @@
             padding: 20px;
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
         }
         
         .purchase-card:hover {
@@ -304,11 +282,24 @@
             transform: translateY(-2px);
         }
         
+        .favorite-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
         .purchase-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 15px;
+            padding-right: 80px;
         }
         
         .purchase-title {
@@ -373,7 +364,8 @@
         .purchase-actions {
             display: flex;
             gap: 10px;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .action-button {
@@ -408,35 +400,53 @@
             background: #e2e8f0;
         }
         
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 30px;
+        .btn-danger {
+            background: #fef2f2;
+            color: #dc2626;
         }
         
-        .page-button {
-            padding: 10px 16px;
-            border: 1px solid #e2e8f0;
-            background: white;
+        .btn-danger:hover {
+            background: #fee2e2;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
             color: #64748b;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
         }
         
-        .page-button:hover {
-            border-color: #3b82f6;
-            color: #3b82f6;
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
         
-        .page-button.active {
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .empty-description {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .empty-action {
             background: #3b82f6;
             color: white;
-            border-color: #3b82f6;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+        
+        .empty-action:hover {
+            background: #2563eb;
         }
         
         /* Responsive */
@@ -450,16 +460,14 @@
                 border-radius: 0 0 15px 15px;
             }
             
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .search-form {
+            .header-content {
                 flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
             
-            .search-input {
-                min-width: auto;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
             
             .filters-grid {
@@ -481,15 +489,15 @@
             background: var(--tg-theme-button-color, linear-gradient(135deg, #1e40af 0%, #3b82f6 100%));
         }
         
-        .telegram-webapp .search-button {
-            background: var(--tg-theme-button-color, linear-gradient(135deg, #059669 0%, #10b981 100%));
-        }
-        
         .telegram-webapp .filter-apply {
             background: var(--tg-theme-button-color, #3b82f6);
         }
         
         .telegram-webapp .btn-primary {
+            background: var(--tg-theme-button-color, #3b82f6);
+        }
+        
+        .telegram-webapp .empty-action {
             background: var(--tg-theme-button-color, #3b82f6);
         }
     </style>
@@ -500,118 +508,93 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1>🏛️ ГосЗакупки</h1>
-                    <p>Поиск государственных закупок по всей России</p>
+                    <a href="index.html" class="back-button">
+                        ← Назад к поиску
+                    </a>
+                    <h1>⭐ Избранные закупки</h1>
                 </div>
                 <div class="header-actions">
-                    <a href="favorites.html" class="action-btn">
-                        ⭐ Избранное
-                    </a>
+                    <button class="action-btn" onclick="exportFavorites()">
+                        📤 Экспорт
+                    </button>
+                    <button class="action-btn" onclick="clearAllFavorites()">
+                        🗑️ Очистить все
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Search Section -->
-        <div class="search-section">
-            <form class="search-form" id="searchForm">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="searchInput"
-                    placeholder="Введите название закупки, товара или услуги..."
-                    autocomplete="off"
-                >
-                <button type="submit" class="search-button">
-                    🔍 Найти закупки
-                </button>
-            </form>
-            
-            <div class="search-examples">
-                <p style="color: #64748b; font-size: 14px; margin: 0;">
-                    💡 Примеры: "бумага А4 офисная", "строительство дорог", "медицинское оборудование"
-                </p>
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalFavorites">0</div>
+                    <div class="stat-label">Всего в избранном</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeFavorites">0</div>
+                    <div class="stat-label">Активные закупки</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalValue">0</div>
+                    <div class="stat-label">Общая сумма (млн ₽)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="deadlineSoon">0</div>
+                    <div class="stat-label">Дедлайн скоро</div>
+                </div>
             </div>
         </div>
 
         <!-- Filters Section -->
         <div class="filters-section">
             <div class="filters-header">
-                <h3 class="filters-title">🔧 Фильтры поиска</h3>
-                <button class="filters-toggle" id="filtersToggle">Показать фильтры</button>
+                <h3 class="filters-title">🔧 Фильтры</h3>
             </div>
             
-            <div class="filters-content" id="filtersContent" style="display: none;">
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Регион</label>
-                        <select class="filter-select" id="regionFilter">
-                            <option value="">Все регионы</option>
-                            <option value="Москва">Москва</option>
-                            <option value="Санкт-Петербург">Санкт-Петербург</option>
-                            <option value="Новосибирск">Новосибирск</option>
-                            <option value="Екатеринбург">Екатеринбург</option>
-                            <option value="Казань">Казань</option>
-                            <option value="Нижний Новгород">Нижний Новгород</option>
-                            <option value="Челябинск">Челябинск</option>
-                            <option value="Самара">Самара</option>
-                            <option value="Уфа">Уфа</option>
-                            <option value="Ростов-на-Дону">Ростов-на-Дону</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Цена от (тыс. ₽)</label>
-                        <input type="number" class="filter-input" id="priceMinFilter" placeholder="0">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Цена до (тыс. ₽)</label>
-                        <input type="number" class="filter-input" id="priceMaxFilter" placeholder="10000">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Статус</label>
-                        <select class="filter-select" id="statusFilter">
-                            <option value="">Все статусы</option>
-                            <option value="published">Опубликовано</option>
-                            <option value="bidding">Подача заявок</option>
-                            <option value="evaluation">Рассмотрение</option>
-                            <option value="awarded">Присуждено</option>
-                            <option value="completed">Завершено</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Способ закупки</label>
-                        <select class="filter-select" id="methodFilter">
-                            <option value="">Все способы</option>
-                            <option value="electronic_auction">Электронный аукцион</option>
-                            <option value="tender">Открытый конкурс</option>
-                            <option value="request_quotes">Запрос котировок</option>
-                            <option value="request_proposals">Запрос предложений</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Дата публикации</label>
-                        <select class="filter-select" id="dateFilter">
-                            <option value="">Любая дата</option>
-                            <option value="today">Сегодня</option>
-                            <option value="week">За неделю</option>
-                            <option value="month">За месяц</option>
-                            <option value="quarter">За квартал</option>
-                        </select>
-                    </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Статус</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Все статусы</option>
+                        <option value="published">Опубликовано</option>
+                        <option value="bidding">Подача заявок</option>
+                        <option value="evaluation">Рассмотрение</option>
+                        <option value="awarded">Присуждено</option>
+                        <option value="completed">Завершено</option>
+                    </select>
                 </div>
                 
-                <div class="filter-actions">
-                    <button type="button" class="filter-button filter-clear" id="clearFilters">
-                        🗑️ Очистить
-                    </button>
-                    <button type="button" class="filter-button filter-apply" id="applyFilters">
-                        ✅ Применить
-                    </button>
+                <div class="filter-group">
+                    <label class="filter-label">Регион</label>
+                    <select class="filter-select" id="regionFilter">
+                        <option value="">Все регионы</option>
+                        <option value="Москва">Москва</option>
+                        <option value="Санкт-Петербург">Санкт-Петербург</option>
+                        <option value="Новосибирск">Новосибирск</option>
+                        <option value="Екатеринбург">Екатеринбург</option>
+                        <option value="Казань">Казань</option>
+                    </select>
                 </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Сортировка</label>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="date_added">По дате добавления</option>
+                        <option value="deadline">По дедлайну</option>
+                        <option value="price">По цене</option>
+                        <option value="relevance">По релевантности</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="filter-button filter-clear" id="clearFilters">
+                    🗑️ Очистить
+                </button>
+                <button class="filter-button filter-apply" id="applyFilters">
+                    ✅ Применить
+                </button>
             </div>
         </div>
 
@@ -619,16 +602,14 @@
         <div class="results-section">
             <div class="results-header">
                 <div class="results-count">
-                    🔍 Найдено закупок: <span id="resultsCount">0</span>
+                    ⭐ В избранном: <span id="resultsCount">0</span> закупок
                 </div>
                 <div class="results-sort">
-                    <span class="sort-label">Сортировка:</span>
-                    <select class="sort-select" id="sortSelect">
-                        <option value="relevance">По релевантности</option>
-                        <option value="price_asc">По цене (возрастание)</option>
-                        <option value="price_desc">По цене (убывание)</option>
-                        <option value="date_desc">По дате (новые)</option>
-                        <option value="date_asc">По дате (старые)</option>
+                    <span class="sort-label">Показывать:</span>
+                    <select class="sort-select" id="viewFilter">
+                        <option value="all">Все</option>
+                        <option value="active">Только активные</option>
+                        <option value="expired">Только просроченные</option>
                     </select>
                 </div>
             </div>
@@ -636,17 +617,12 @@
             <div class="purchase-grid" id="purchaseGrid">
                 <!-- Purchase cards will be inserted here -->
             </div>
-            
-            <!-- Pagination -->
-            <div class="pagination" id="pagination" style="display: none;">
-                <!-- Pagination buttons will be inserted here -->
-            </div>
         </div>
     </div>
 
     <script>
         // Mock data for demonstration
-        const mockPurchases = [
+        let mockFavorites = [
             {
                 id: 1,
                 title: "Поставка канцелярских товаров для государственных учреждений",
@@ -656,7 +632,8 @@
                 customer: "Департамент образования г. Москвы",
                 deadline: "2024-12-31",
                 method: "electronic_auction",
-                description: "Поставка бумаги А4, ручек, карандашей и других канцелярских принадлежностей"
+                description: "Поставка бумаги А4, ручек, карандашей и других канцелярских принадлежностей",
+                dateAdded: "2024-10-15"
             },
             {
                 id: 2,
@@ -667,7 +644,8 @@
                 customer: "Министерство транспорта Краснодарского края",
                 deadline: "2024-11-15",
                 method: "tender",
-                description: "Строительство дороги протяженностью 15 км с мостовыми переходами"
+                description: "Строительство дороги протяженностью 15 км с мостовыми переходами",
+                dateAdded: "2024-10-10"
             },
             {
                 id: 3,
@@ -678,29 +656,8 @@
                 customer: "Комитет по информатизации и связи",
                 deadline: "2024-10-20",
                 method: "request_proposals",
-                description: "Создание системы электронного документооборота для государственных органов"
-            },
-            {
-                id: 4,
-                title: "Поставка медицинского оборудования для городской больницы",
-                status: "awarded",
-                price: 45000000,
-                region: "Новосибирск",
-                customer: "Городская клиническая больница №1",
-                deadline: "2024-09-30",
-                method: "electronic_auction",
-                description: "Поставка рентгеновского оборудования, УЗИ аппаратов и лабораторного оборудования"
-            },
-            {
-                id: 5,
-                title: "Оказание услуг по уборке и содержанию территории",
-                status: "published",
-                price: 1200000,
-                region: "Екатеринбург",
-                customer: "Администрация Ленинского района",
-                deadline: "2024-12-15",
-                method: "request_quotes",
-                description: "Уборка улиц, вывоз мусора, содержание зеленых насаждений"
+                description: "Создание системы электронного документооборота для государственных органов",
+                dateAdded: "2024-10-05"
             }
         ];
 
@@ -718,26 +675,18 @@
                 tg.expand();
             }
 
+            // Load favorites from localStorage
+            loadFavorites();
+            
             // Setup event listeners
             setupEventListeners();
             
             // Show initial results
-            displayPurchases(mockPurchases);
-            updateResultsCount(mockPurchases.length);
+            displayFavorites(mockFavorites);
+            updateStats();
         }
 
         function setupEventListeners() {
-            // Search form
-            document.getElementById('searchForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                performSearch();
-            });
-
-            // Filters toggle
-            document.getElementById('filtersToggle').addEventListener('click', function() {
-                toggleFilters();
-            });
-
             // Apply filters
             document.getElementById('applyFilters').addEventListener('click', function() {
                 applyFilters();
@@ -748,137 +697,118 @@
                 clearFilters();
             });
 
-            // Sort change
-            document.getElementById('sortSelect').addEventListener('change', function() {
+            // View filter change
+            document.getElementById('viewFilter').addEventListener('change', function() {
+                applyViewFilter();
+            });
+
+            // Sort filter change
+            document.getElementById('sortFilter').addEventListener('change', function() {
                 applySorting();
             });
         }
 
-        function toggleFilters() {
-            const filtersContent = document.getElementById('filtersContent');
-            const toggleButton = document.getElementById('filtersToggle');
-            
-            if (filtersContent.style.display === 'none') {
-                filtersContent.style.display = 'block';
-                toggleButton.textContent = 'Скрыть фильтры';
-            } else {
-                filtersContent.style.display = 'none';
-                toggleButton.textContent = 'Показать фильтры';
-            }
-        }
-
-        function performSearch() {
-            const searchQuery = document.getElementById('searchInput').value.trim();
-            if (!searchQuery) return;
-
-            // Simulate search
-            const filtered = mockPurchases.filter(purchase => 
-                purchase.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                purchase.description.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-
-            displayPurchases(filtered);
-            updateResultsCount(filtered.length);
+        function loadFavorites() {
+            // This would normally load from localStorage or API
+            // For now, we'll use mock data
+            console.log('Loading favorites...');
         }
 
         function applyFilters() {
-            const region = document.getElementById('regionFilter').value;
-            const priceMin = parseFloat(document.getElementById('priceMinFilter').value) * 1000;
-            const priceMax = parseFloat(document.getElementById('priceMaxFilter').value) * 1000;
             const status = document.getElementById('statusFilter').value;
-            const method = document.getElementById('methodFilter').value;
+            const region = document.getElementById('regionFilter').value;
 
-            let filtered = [...mockPurchases];
-
-            if (region) {
-                filtered = filtered.filter(p => p.region === region);
-            }
-
-            if (priceMin) {
-                filtered = filtered.filter(p => p.price >= priceMin);
-            }
-
-            if (priceMax) {
-                filtered = filtered.filter(p => p.price <= priceMax);
-            }
+            let filtered = [...mockFavorites];
 
             if (status) {
                 filtered = filtered.filter(p => p.status === status);
             }
 
-            if (method) {
-                filtered = filtered.filter(p => p.method === method);
+            if (region) {
+                filtered = filtered.filter(p => p.region === region);
             }
 
-            displayPurchases(filtered);
+            displayFavorites(filtered);
             updateResultsCount(filtered.length);
         }
 
         function clearFilters() {
-            document.getElementById('regionFilter').value = '';
-            document.getElementById('priceMinFilter').value = '';
-            document.getElementById('priceMaxFilter').value = '';
             document.getElementById('statusFilter').value = '';
-            document.getElementById('methodFilter').value = '';
+            document.getElementById('regionFilter').value = '';
 
-            displayPurchases(mockPurchases);
-            updateResultsCount(mockPurchases.length);
+            displayFavorites(mockFavorites);
+            updateResultsCount(mockFavorites.length);
         }
 
-        function applySorting() {
-            const sortBy = document.getElementById('sortSelect').value;
-            const currentPurchases = getCurrentDisplayedPurchases();
-            
-            let sorted = [...currentPurchases];
+        function applyViewFilter() {
+            const viewType = document.getElementById('viewFilter').value;
+            let filtered = [...mockFavorites];
 
-            switch (sortBy) {
-                case 'price_asc':
-                    sorted.sort((a, b) => a.price - b.price);
+            switch (viewType) {
+                case 'active':
+                    filtered = filtered.filter(p => 
+                        p.status === 'published' || p.status === 'bidding' || p.status === 'evaluation'
+                    );
                     break;
-                case 'price_desc':
-                    sorted.sort((a, b) => b.price - a.price);
-                    break;
-                case 'date_desc':
-                    sorted.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
-                    break;
-                case 'date_asc':
-                    sorted.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+                case 'expired':
+                    filtered = filtered.filter(p => 
+                        new Date(p.deadline) < new Date()
+                    );
                     break;
                 default:
-                    // relevance - keep original order
+                    // Show all
                     break;
             }
 
-            displayPurchases(sorted);
+            displayFavorites(filtered);
+            updateResultsCount(filtered.length);
         }
 
-        function getCurrentDisplayedPurchases() {
-            // This would normally track the current filtered results
-            return mockPurchases;
+        function applySorting() {
+            const sortBy = document.getElementById('sortFilter').value;
+            let sorted = [...mockFavorites];
+
+            switch (sortBy) {
+                case 'deadline':
+                    sorted.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+                    break;
+                case 'price':
+                    sorted.sort((a, b) => a.price - b.price);
+                    break;
+                case 'date_added':
+                    sorted.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                    break;
+                default:
+                    // Keep original order
+                    break;
+            }
+
+            displayFavorites(sorted);
         }
 
-        function displayPurchases(purchases) {
+        function displayFavorites(favorites) {
             const grid = document.getElementById('purchaseGrid');
             grid.innerHTML = '';
 
-            if (purchases.length === 0) {
+            if (favorites.length === 0) {
                 grid.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #64748b;">
-                        <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-                        <h3>Закупки не найдены</h3>
-                        <p>Попробуйте изменить параметры поиска или фильтры</p>
+                    <div class="empty-state">
+                        <div class="empty-icon">⭐</div>
+                        <h3 class="empty-title">Избранных закупок пока нет</h3>
+                        <p class="empty-description">Добавляйте интересующие закупки в избранное для быстрого доступа</p>
+                        <a href="index.html" class="empty-action">🔍 Найти закупки</a>
                     </div>
                 `;
                 return;
             }
 
-            purchases.forEach(purchase => {
-                const card = createPurchaseCard(purchase);
+            favorites.forEach(purchase => {
+                const card = createFavoriteCard(purchase);
                 grid.appendChild(card);
             });
         }
 
-        function createPurchaseCard(purchase) {
+        function createFavoriteCard(purchase) {
             const card = document.createElement('div');
             card.className = 'purchase-card';
             card.onclick = () => showPurchaseDetails(purchase);
@@ -889,6 +819,7 @@
             const priceText = formatPrice(purchase.price);
 
             card.innerHTML = `
+                <div class="favorite-badge">⭐</div>
                 <div class="purchase-header">
                     <h3 class="purchase-title">${purchase.title}</h3>
                     <span class="purchase-status ${statusClass}">${statusText}</span>
@@ -916,8 +847,8 @@
                 <div class="purchase-price">${priceText}</div>
                 
                 <div class="purchase-actions">
-                    <button class="action-button btn-secondary" onclick="event.stopPropagation(); toggleFavorite(${purchase.id})">
-                        ⭐ Избранное
+                    <button class="action-button btn-danger" onclick="event.stopPropagation(); removeFromFavorites(${purchase.id})">
+                        💔 Убрать из избранного
                     </button>
                     <button class="action-button btn-primary" onclick="event.stopPropagation(); showPurchaseDetails(${purchase})">
                         📋 Подробнее
@@ -967,14 +898,57 @@
             document.getElementById('resultsCount').textContent = count;
         }
 
+        function updateStats() {
+            const total = mockFavorites.length;
+            const active = mockFavorites.filter(p => 
+                p.status === 'published' || p.status === 'bidding' || p.status === 'evaluation'
+            ).length;
+            const totalValue = mockFavorites.reduce((sum, p) => sum + p.price, 0) / 1000000;
+            const deadlineSoon = mockFavorites.filter(p => {
+                const deadline = new Date(p.deadline);
+                const now = new Date();
+                const diffDays = (deadline - now) / (1000 * 60 * 60 * 24);
+                return diffDays <= 7 && diffDays > 0;
+            }).length;
+
+            document.getElementById('totalFavorites').textContent = total;
+            document.getElementById('activeFavorites').textContent = active;
+            document.getElementById('totalValue').textContent = totalValue.toFixed(1);
+            document.getElementById('deadlineSoon').textContent = deadlineSoon;
+        }
+
         function showPurchaseDetails(purchase) {
-            // Navigate to detailed view
             window.location.href = `purchase-detail.html?id=${purchase.id}`;
         }
 
-        function toggleFavorite(purchaseId) {
-            // This would normally toggle favorite status
-            alert(`Закупка ${purchaseId} добавлена в избранное!`);
+        function removeFromFavorites(purchaseId) {
+            if (confirm('Убрать закупку из избранного?')) {
+                mockFavorites = mockFavorites.filter(p => p.id !== purchaseId);
+                displayFavorites(mockFavorites);
+                updateStats();
+                updateResultsCount(mockFavorites.length);
+            }
+        }
+
+        function exportFavorites() {
+            // Export favorites to CSV or JSON
+            const dataStr = JSON.stringify(mockFavorites, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'favorites.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllFavorites() {
+            if (confirm('Очистить все избранные закупки? Это действие нельзя отменить.')) {
+                mockFavorites = [];
+                displayFavorites([]);
+                updateStats();
+                updateResultsCount(0);
+            }
         }
     </script>
 </body>
