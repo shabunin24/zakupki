@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест поиска - Простая версия</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .search-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .search-button:hover {
+            background: #0056b3;
+        }
+        .results {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест поиска закупок</h1>
+    
+    <div class="search-box">
+        <h3>🔍 Поиск закупок</h3>
+        <input type="text" class="search-input" id="searchInput" placeholder="Введите запрос (например: бумага, строительство)">
+        <button class="search-button" onclick="testSearch()">🔍 Найти закупки</button>
+    </div>
+    
+    <div class="results" id="results">
+        <p>Результаты поиска появятся здесь...</p>
+    </div>
+    
+    <div class="debug-info" id="debugInfo">
+        <strong>Debug информация:</strong><br>
+        Страница загружена: <span id="loadTime"></span><br>
+        Поисков выполнено: <span id="searchCount">0</span><br>
+        Последний запрос: <span id="lastQuery">-</span>
+    </div>
+
+    <script>
+        // Простая функция поиска
+        function testSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Введите запрос для поиска!');
+                return;
+            }
+            
+            console.log('Поиск запущен:', query);
+            
+            // Обновляем debug информацию
+            document.getElementById('lastQuery').textContent = query;
+            const searchCount = parseInt(document.getElementById('searchCount').textContent) + 1;
+            document.getElementById('searchCount').textContent = searchCount;
+            
+            // Показываем loading
+            document.getElementById('results').innerHTML = '<p>🔍 Ищем закупки по запросу: "' + query + '"...</p>';
+            
+            // Имитируем поиск
+            setTimeout(() => {
+                const results = generateTestResults(query);
+                showResults(results, query);
+            }, 1000);
+        }
+        
+        function generateTestResults(query) {
+            const results = [];
+            const queryLower = query.toLowerCase();
+            
+            if (queryLower.includes('бумага') || queryLower.includes('канц')) {
+                for (let i = 1; i <= 10; i++) {
+                    results.push({
+                        title: `Поставка канцелярских товаров ${i}`,
+                        price: Math.floor(Math.random() * 1000000) + 100000,
+                        region: ['Москва', 'СПб', 'Краснодар'][Math.floor(Math.random() * 3)],
+                        status: 'Опубликовано'
+                    });
+                }
+            } else if (queryLower.includes('строитель')) {
+                for (let i = 1; i <= 8; i++) {
+                    results.push({
+                        title: `Строительные работы ${i}`,
+                        price: Math.floor(Math.random() * 10000000) + 1000000,
+                        region: ['Москва', 'Краснодар', 'Ростов'][Math.floor(Math.random() * 3)],
+                        status: 'Подача заявок'
+                    });
+                }
+            } else {
+                for (let i = 1; i <= 5; i++) {
+                    results.push({
+                        title: `Закупка ${query} ${i}`,
+                        price: Math.floor(Math.random() * 500000) + 50000,
+                        region: ['Москва', 'СПб', 'Екатеринбург'][Math.floor(Math.random() * 3)],
+                        status: 'Опубликовано'
+                    });
+                }
+            }
+            
+            return results;
+        }
+        
+        function showResults(results, query) {
+            let html = `<h3>🔍 Результаты поиска: "${query}"</h3>`;
+            html += `<p>Найдено закупок: ${results.length}</p>`;
+            
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <h4>${result.title}</h4>
+                        <p><strong>Цена:</strong> ${result.price.toLocaleString()} ₽</p>
+                        <p><strong>Регион:</strong> ${result.region}</p>
+                        <p><strong>Статус:</strong> ${result.status}</p>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('results').innerHTML = html;
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loadTime').textContent = new Date().toLocaleString();
+            console.log('Тестовая страница загружена');
+            
+            // Автоматический поиск при Enter
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testSearch();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
