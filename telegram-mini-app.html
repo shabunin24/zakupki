@@ -1120,19 +1120,118 @@
         }
 
         function showNotification(message) {
-            if (window.Telegram && window.Telegram.WebApp) {
-                // Use Telegram notification
-                const tg = window.Telegram.WebApp;
-                tg.showAlert(message);
-            } else {
-                // Use browser alert
-                alert(message);
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    
+                    // Try different notification methods based on version
+                    if (tg.showPopup && typeof tg.showPopup === 'function') {
+                        // Use showPopup if available
+                        tg.showPopup({
+                            title: 'Уведомление',
+                            message: message,
+                            buttons: [{text: 'OK', type: 'ok'}]
+                        });
+                    } else if (tg.showAlert && typeof tg.showAlert === 'function') {
+                        // Use showAlert if available
+                        tg.showAlert(message);
+                    } else if (tg.MainButton && tg.MainButton.show) {
+                        // Use MainButton as fallback
+                        tg.MainButton.text = message;
+                        tg.MainButton.show();
+                        setTimeout(() => tg.MainButton.hide(), 3000);
+                    } else {
+                        // Fallback to browser alert
+                        console.log('Telegram notification:', message);
+                        showBrowserNotification(message);
+                    }
+                } else {
+                    // Use browser notification
+                    showBrowserNotification(message);
+                }
+            } catch (error) {
+                console.log('Telegram notification failed:', error);
+                // Fallback to browser notification
+                showBrowserNotification(message);
             }
+        }
+        
+        function showBrowserNotification(message) {
+            // Create a custom notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #3b82f6;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 300px;
+                word-wrap: break-word;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Add animation CSS
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
         
         // Initialize search form when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded, initializing search form...');
+            
+            // Check Telegram WebApp version and capabilities
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                console.log('Telegram WebApp detected:', {
+                    version: tg.version,
+                    platform: tg.platform,
+                    colorScheme: tg.colorScheme,
+                    themeParams: tg.themeParams,
+                    initData: tg.initData ? 'Available' : 'Not available',
+                    initDataUnsafe: tg.initDataUnsafe ? 'Available' : 'Not available'
+                });
+                
+                // Check available methods
+                const availableMethods = [];
+                if (tg.showPopup) availableMethods.push('showPopup');
+                if (tg.showAlert) availableMethods.push('showAlert');
+                if (tg.MainButton) availableMethods.push('MainButton');
+                if (tg.BackButton) availableMethods.push('BackButton');
+                
+                console.log('Available Telegram methods:', availableMethods);
+            } else {
+                console.log('Telegram WebApp not detected, running in browser mode');
+            }
             
             // Find the search form and attach event listener
             const searchForm = document.getElementById('searchForm');
