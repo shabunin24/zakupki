@@ -462,9 +462,24 @@
         }
 
         function performSearch() {
-            const searchQuery = document.getElementById('searchInput').value.trim();
-            if (!searchQuery) return;
+            console.log('=== performSearch вызвана ===');
+            
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) {
+                console.error('Поле поиска не найдено!');
+                return;
+            }
+            
+            const searchQuery = searchInput.value.trim();
+            console.log('Значение поля поиска:', searchQuery);
+            
+            if (!searchQuery) {
+                console.log('Пустой запрос, поиск не выполняется');
+                return;
+            }
 
+            console.log('Запускаем поиск для запроса:', searchQuery);
+            
             // Show notification
             showNotification(`🔍 Поиск: "${searchQuery}" - ищем закупки...`);
             
@@ -1268,12 +1283,13 @@
         
         // Initialize search form when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing search form...');
+            console.log('=== DOMContentLoaded сработал ===');
+            console.log('Инициализируем форму поиска...');
             
             // Check Telegram WebApp version and capabilities
             if (window.Telegram && window.Telegram.WebApp) {
                 const tg = window.Telegram.WebApp;
-                console.log('Telegram WebApp detected:', {
+                console.log('Telegram WebApp обнаружен:', {
                     version: tg.version,
                     platform: tg.platform,
                     colorScheme: tg.colorScheme,
@@ -1289,36 +1305,51 @@
                 if (tg.MainButton) availableMethods.push('MainButton');
                 if (tg.BackButton) availableMethods.push('BackButton');
                 
-                console.log('Available Telegram methods:', availableMethods);
+                console.log('Доступные методы Telegram:', availableMethods);
             } else {
-                console.log('Telegram WebApp not detected, running in browser mode');
+                console.log('Telegram WebApp не обнаружен, работаем в режиме браузера');
             }
             
             // Find the search form and attach event listener
             const searchForm = document.getElementById('searchForm');
+            console.log('Поиск формы:', searchForm ? 'НАЙДЕНА' : 'НЕ НАЙДЕНА');
+            
             if (searchForm) {
-                console.log('Search form found, attaching event listener...');
+                console.log('Прикрепляем event listener к форме...');
                 searchForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    console.log('Search form submitted, calling performSearch...');
+                    console.log('Форма отправлена, вызываем performSearch...');
                     performSearch();
                 });
+                console.log('Event listener к форме прикреплен');
             } else {
-                console.error('Search form not found!');
+                console.error('Форма поиска не найдена!');
             }
             
             // Also attach click event to search button for extra reliability
             const searchButton = document.querySelector('.search-button');
+            console.log('Поиск кнопки:', searchButton ? 'НАЙДЕНА' : 'НЕ НАЙДЕНА');
+            
             if (searchButton) {
-                console.log('Search button found, attaching click listener...');
+                console.log('Прикрепляем click listener к кнопке...');
                 searchButton.addEventListener('click', function(e) {
                     e.preventDefault();
-                    console.log('Search button clicked, calling performSearch...');
+                    console.log('Кнопка нажата, вызываем performSearch...');
                     performSearch();
                 });
+                console.log('Click listener к кнопке прикреплен');
+            } else {
+                console.error('Кнопка поиска не найдена!');
             }
             
-            console.log('Search form initialization complete!');
+            // Проверяем все элементы формы
+            console.log('=== ПРОВЕРКА ЭЛЕМЕНТОВ ===');
+            console.log('searchForm:', document.getElementById('searchForm'));
+            console.log('searchInput:', document.getElementById('searchInput'));
+            console.log('searchButton:', document.querySelector('.search-button'));
+            console.log('search-section:', document.querySelector('.search-section'));
+            
+            console.log('Инициализация формы поиска завершена!');
         });
         
         // Debug function to test search manually
