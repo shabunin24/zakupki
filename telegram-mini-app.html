@@ -461,11 +461,319 @@
             if (!searchQuery) return;
 
             // Show notification
-            showNotification(`🔍 Поиск: "${searchQuery}" - переходим к результатам...`);
+            showNotification(`🔍 Поиск: "${searchQuery}" - ищем закупки...`);
             
-            // Redirect to main search page
+            // Perform actual search
+            searchPurchases(searchQuery);
+        }
+        
+        // Mock data for demonstration
+        const mockPurchases = [
+            {
+                id: 1,
+                title: "Поставка канцелярских товаров для государственных учреждений",
+                status: "published",
+                price: 2500000,
+                region: "Москва",
+                customer: "Департамент образования г. Москвы",
+                deadline: "2024-12-31",
+                method: "electronic_auction",
+                description: "Поставка бумаги А4, ручек, карандашей и других канцелярских принадлежностей"
+            },
+            {
+                id: 2,
+                title: "Строительство автомобильной дороги регионального значения",
+                status: "bidding",
+                price: 150000000,
+                region: "Краснодарский край",
+                customer: "Министерство транспорта Краснодарского края",
+                deadline: "2024-11-15",
+                method: "tender",
+                description: "Строительство дороги протяженностью 15 км с мостовыми переходами"
+            },
+            {
+                id: 3,
+                title: "Разработка программного обеспечения для электронного документооборота",
+                status: "evaluation",
+                price: 8500000,
+                region: "Санкт-Петербург",
+                customer: "Комитет по информатизации и связи",
+                deadline: "2024-10-20",
+                method: "request_proposals",
+                description: "Создание системы электронного документооборота для государственных органов"
+            },
+            {
+                id: 4,
+                title: "Поставка медицинского оборудования для городской больницы",
+                status: "awarded",
+                price: 45000000,
+                region: "Новосибирск",
+                customer: "Городская клиническая больница №1",
+                deadline: "2024-09-30",
+                method: "electronic_auction",
+                description: "Поставка рентгеновского оборудования, УЗИ аппаратов и лабораторного оборудования"
+            },
+            {
+                id: 5,
+                title: "Оказание услуг по уборке и содержанию территории",
+                status: "published",
+                price: 1200000,
+                region: "Екатеринбург",
+                customer: "Администрация Ленинского района",
+                deadline: "2024-12-15",
+                method: "request_quotes",
+                description: "Уборка улиц, вывоз мусора, содержание зеленых насаждений"
+            }
+        ];
+        
+        function searchPurchases(query) {
+            // Filter purchases based on search query
+            const filtered = mockPurchases.filter(purchase => 
+                purchase.title.toLowerCase().includes(query.toLowerCase()) ||
+                purchase.description.toLowerCase().includes(query.toLowerCase()) ||
+                purchase.region.toLowerCase().includes(query.toLowerCase()) ||
+                purchase.customer.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            // Show results
+            showSearchResults(filtered, query);
+        }
+        
+        function showSearchResults(purchases, query) {
+            // Create results section
+            const resultsHTML = createResultsHTML(purchases, query);
+            
+            // Replace search section with results
+            const searchSection = document.querySelector('.search-section');
+            searchSection.innerHTML = resultsHTML;
+            
+            // Add back button
+            const backButton = document.createElement('div');
+            backButton.innerHTML = `
+                <button onclick="showSearchForm()" style="
+                    background: #3b82f6;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    margin-top: 20px;
+                ">
+                    ← Новый поиск
+                </button>
+            `;
+            searchSection.appendChild(backButton);
+        }
+        
+        function createResultsHTML(purchases, query) {
+            if (purchases.length === 0) {
+                return `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
+                        <h3 style="color: #1e293b; margin-bottom: 10px;">Закупки не найдены</h3>
+                        <p style="color: #64748b;">По запросу "${query}" ничего не найдено</p>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 20px;">
+                            Попробуйте изменить запрос или использовать другие ключевые слова
+                        </p>
+                    </div>
+                `;
+            }
+            
+            let resultsHTML = `
+                <h3 style="color: #1e293b; margin-bottom: 20px; text-align: center;">
+                    🔍 Результаты поиска: "${query}"
+                </h3>
+                <p style="color: #64748b; text-align: center; margin-bottom: 30px;">
+                    Найдено закупок: ${purchases.length}
+                </p>
+                <div style="display: grid; gap: 20px;">
+            `;
+            
+            purchases.forEach(purchase => {
+                resultsHTML += createPurchaseCardHTML(purchase);
+            });
+            
+            resultsHTML += '</div>';
+            return resultsHTML;
+        }
+        
+        function createPurchaseCardHTML(purchase) {
+            const statusClass = `status-${purchase.status}`;
+            const statusText = getStatusText(purchase.status);
+            const methodText = getMethodText(purchase.method);
+            const priceText = formatPrice(purchase.price);
+            
+            return `
+                <div style="
+                    background: white;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                    padding: 20px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <h4 style="
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            color: #1e293b;
+                            line-height: 1.4;
+                            margin: 0;
+                            flex: 1;
+                            margin-right: 15px;
+                        ">${purchase.title}</h4>
+                        <span style="
+                            padding: 6px 12px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            font-weight: 500;
+                            white-space: nowrap;
+                            ${getStatusStyle(purchase.status)}
+                        ">${statusText}</span>
+                    </div>
+                    
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 15px;
+                        margin-bottom: 15px;
+                    ">
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
+                            <span>📍</span>
+                            <span>${purchase.region}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
+                            <span>🏢</span>
+                            <span>${purchase.customer}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
+                            <span>📋</span>
+                            <span>${methodText}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
+                            <span>⏰</span>
+                            <span>До ${formatDate(purchase.deadline)}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="
+                        font-size: 1.2rem;
+                        font-weight: 700;
+                        color: #059669;
+                        margin-bottom: 15px;
+                    ">${priceText}</div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button onclick="addToFavorites(${purchase.id})" style="
+                            background: #f1f5f9;
+                            color: #64748b;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                        ">⭐ В избранное</button>
+                        <button onclick="showPurchaseDetails(${purchase.id})" style="
+                            background: #3b82f6;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                        ">📋 Подробнее</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getStatusText(status) {
+            const statuses = {
+                'published': 'Опубликовано',
+                'bidding': 'Подача заявок',
+                'evaluation': 'Рассмотрение',
+                'awarded': 'Присуждено',
+                'completed': 'Завершено',
+                'cancelled': 'Отменено'
+            };
+            return statuses[status] || status;
+        }
+        
+        function getMethodText(method) {
+            const methods = {
+                'electronic_auction': 'Электронный аукцион',
+                'tender': 'Открытый конкурс',
+                'request_quotes': 'Запрос котировок',
+                'request_proposals': 'Запрос предложений'
+            };
+            return methods[method] || method;
+        }
+        
+        function getStatusStyle(status) {
+            const styles = {
+                'published': 'background: #dbeafe; color: #1e40af;',
+                'bidding': 'background: #fef3c7; color: #d97706;',
+                'evaluation': 'background: #f3e8ff; color: #7c3aed;',
+                'awarded': 'background: #d1fae5; color: #059669;',
+                'completed': 'background: #d1fae5; color: #059669;',
+                'cancelled': 'background: #fee2e2; color: #dc2626;'
+            };
+            return styles[status] || 'background: #f1f5f9; color: #64748b;';
+        }
+        
+        function formatPrice(price) {
+            if (price >= 1000000) {
+                return `${(price / 1000000).toFixed(1)} млн ₽`;
+            } else if (price >= 1000) {
+                return `${(price / 1000).toFixed(0)} тыс ₽`;
+            }
+            return `${price} ₽`;
+        }
+        
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('ru-RU');
+        }
+        
+        function showSearchForm() {
+            // Restore original search form
+            const searchSection = document.querySelector('.search-section');
+            searchSection.innerHTML = `
+                <form class="search-form" id="searchForm">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput"
+                        placeholder="Введите название закупки, товара или услуги..."
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="search-button">
+                        🔍 Найти закупки
+                    </button>
+                </form>
+                
+                <div class="search-examples">
+                    <p style="color: #64748b; font-size: 14px; margin: 0; text-align: center;">
+                        💡 Примеры: "бумага А4 офисная", "строительство дорог", "медицинское оборудование"
+                    </p>
+                </div>
+            `;
+            
+            // Reattach event listener
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                performSearch();
+            });
+        }
+        
+        function addToFavorites(purchaseId) {
+            showNotification(`⭐ Закупка ${purchaseId} добавлена в избранное!`);
+        }
+        
+        function showPurchaseDetails(purchaseId) {
+            showNotification(`📋 Открываем детали закупки ${purchaseId}...`);
+            // Redirect to detail page
             setTimeout(() => {
-                window.location.href = `index.html?search=${encodeURIComponent(searchQuery)}`;
+                window.location.href = `purchase-detail.html?id=${purchaseId}`;
             }, 1000);
         }
 
