@@ -6,463 +6,105 @@
     <title>ГосЗакупки - Telegram Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 20px;
+            background: #f8fafc;
         }
-        
-        /* Header */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
         .header {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             color: white;
-            padding: 30px 0;
-            margin: -20px -20px 30px -20px;
-            border-radius: 0 0 20px 20px;
-        }
-        
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-        
-        /* Telegram Status */
-        .telegram-status {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .status-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        
-        .status-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 10px;
-        }
-        
-        .status-description {
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-        
-        /* Search Section */
-        .search-section {
-            background: white;
-            border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            text-align: center;
             margin-bottom: 30px;
         }
-        
-        .search-form {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .search-input {
-            flex: 1;
-            min-width: 300px;
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8fafc;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: #3b82f6;
+        .search-box {
             background: white;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
-        
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
         .search-button {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            background: #3b82f6;
             color: white;
             border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
+            padding: 15px 30px;
+            border-radius: 10px;
             font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+            width: 100%;
         }
-        
         .search-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+            background: #2563eb;
         }
-        
-        /* Quick Actions */
-        .quick-actions {
+        .results {
             background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
-        .actions-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .action-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+        .result-item {
+            border: 1px solid #e2e8f0;
             padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-        }
-        
-        .action-card:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-            transform: translateY(-2px);
-        }
-        
-        .action-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        
-        .action-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-        
-        .action-description {
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        
-        /* Features */
-        .features {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .features-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
             margin-bottom: 20px;
-            text-align: center;
+            border-radius: 10px;
         }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-        
-        .feature-icon {
-            font-size: 1.5rem;
-            color: #3b82f6;
-        }
-        
-        .feature-text {
-            font-size: 0.9rem;
-            color: #475569;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .header {
-                margin: -15px -15px 20px -15px;
-                border-radius: 0 0 15px 15px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .search-form {
-                flex-direction: column;
-            }
-            
-            .search-input {
-                min-width: auto;
-            }
-            
-            .actions-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Telegram WebApp Styles */
-        .telegram-webapp {
-            background: var(--tg-theme-bg-color, #f8fafc);
-            color: var(--tg-theme-text-color, #1e293b);
-        }
-        
-        .telegram-webapp .header {
-            background: var(--tg-theme-button-color, linear-gradient(135deg, #1e40af 0%, #3b82f6 100%));
-        }
-        
-        .telegram-webapp .search-button {
-            background: var(--tg-theme-button-color, linear-gradient(135deg, #059669 0%, #10b981 100%));
-        }
-        
-        .telegram-webapp .action-card:hover {
-            border-color: var(--tg-theme-button-color, #3b82f6);
+        .debug-info {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <div class="header-content">
-                <h1>🏛️ ГосЗакупки</h1>
-                <p>Поиск государственных закупок по всей России</p>
-            </div>
+            <h1>🏛️ ГосЗакупки</h1>
+            <p>Поиск государственных закупок по всей России</p>
         </div>
-
-        <!-- Telegram Status -->
-        <div class="telegram-status" id="telegramStatus">
-            <div class="status-icon">📱</div>
-            <h2 class="status-title">Telegram Mini App</h2>
-            <p class="status-description">Проверяем подключение к Telegram...</p>
+        
+        <div class="search-box">
+            <h3>🔍 Поиск закупок</h3>
+            <input type="text" class="search-input" id="searchInput" placeholder="Введите запрос (например: бумага, строительство)">
+            <button class="search-button" onclick="simpleSearch()">🔍 Найти закупки</button>
         </div>
-
-        <!-- Search Section -->
-        <div class="search-section">
-            <form class="search-form" id="searchForm">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="searchInput"
-                    placeholder="Введите название закупки, товара или услуги..."
-                    autocomplete="off"
-                >
-                <button type="submit" class="search-button">
-                    🔍 Найти закупки
-                </button>
-            </form>
-            
-            <div class="search-examples">
-                <p style="color: #64748b; font-size: 14px; margin: 0; text-align: center;">
-                    💡 Примеры: "бумага А4 офисная", "строительство дорог", "медицинское оборудование"
-                </p>
-            </div>
+        
+        <div class="results" id="results">
+            <p>Результаты поиска появятся здесь...</p>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h3 class="actions-title">🚀 Быстрые действия</h3>
-            <div class="actions-grid">
-                <a href="index.html" class="action-card">
-                    <div class="action-icon">🔍</div>
-                    <div class="action-title">Полный поиск</div>
-                    <div class="action-description">Расширенные фильтры и результаты</div>
-                </a>
-                
-                <a href="favorites.html" class="action-card">
-                    <div class="action-icon">⭐</div>
-                    <div class="action-title">Избранное</div>
-                    <div class="action-description">Сохраненные закупки</div>
-                </a>
-                
-                <a href="purchase-detail.html" class="action-card">
-                    <div class="action-icon">📋</div>
-                    <div class="action-title">Детали закупки</div>
-                    <div class="action-description">Пример детальной информации</div>
-                </a>
-                
-                <a href="#" class="action-card" onclick="showNotification('🔔 Уведомления будут доступны в полной версии!')">
-                    <div class="action-icon">🔔</div>
-                    <div class="action-title">Уведомления</div>
-                    <div class="action-description">О новых закупках</div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Features -->
-        <div class="features">
-            <h3 class="features-title">✨ Возможности приложения</h3>
-            <div class="features-grid">
-                <div class="feature-item">
-                    <div class="feature-icon">🔍</div>
-                    <div class="feature-text">Поиск по естественному языку</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📍</div>
-                    <div class="feature-text">Фильтрация по регионам</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">💰</div>
-                    <div class="feature-text">Фильтры по цене</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📅</div>
-                    <div class="feature-text">Фильтры по датам</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">⭐</div>
-                    <div class="feature-text">Система избранного</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📱</div>
-                    <div class="feature-text">Мобильная оптимизация</div>
-                </div>
-            </div>
+        
+        <div class="debug-info" id="debugInfo">
+            <strong>Debug информация:</strong><br>
+            Страница загружена: <span id="loadTime"></span><br>
+            Поисков выполнено: <span id="searchCount">0</span><br>
+            Последний запрос: <span id="lastQuery">-</span><br>
+            Последний результат: <span id="lastResult">-</span>
         </div>
     </div>
 
     <script>
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-        });
-
-        function initializeApp() {
-            // Check if running in Telegram WebApp
-            if (window.Telegram && window.Telegram.WebApp) {
-                document.body.classList.add('telegram-webapp');
-                const tg = window.Telegram.WebApp;
-                tg.ready();
-                tg.expand();
-                
-                // Update status
-                updateTelegramStatus(tg);
-                
-                console.log('Telegram WebApp инициализирован:', tg);
-            } else {
-                // Not in Telegram
-                updateTelegramStatus(null);
-            }
-
-            // Setup event listeners
-            setupEventListeners();
-        }
-
-        function updateTelegramStatus(tg) {
-            const statusElement = document.getElementById('telegramStatus');
-            
-            if (tg) {
-                statusElement.innerHTML = `
-                    <div class="status-icon">✅</div>
-                    <h2 class="status-title">Запущено в Telegram!</h2>
-                    <p class="status-description">Ваше приложение успешно работает в Telegram WebApp</p>
-                `;
-                
-                // Show user info if available
-                if (tg.initDataUnsafe?.user) {
-                    const user = tg.initDataUnsafe.user;
-                    statusElement.innerHTML += `
-                        <div style="margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 8px; border: 1px solid #0ea5e9;">
-                            <p style="margin: 0; color: #0c4a6e; font-size: 14px;">
-                                <strong>👤 Пользователь:</strong> ${user.firstName || ''} ${user.lastName || ''}
-                                ${user.username ? `(@${user.username})` : ''}
-                            </p>
-                        </div>
-                    `;
-                }
-            } else {
-                statusElement.innerHTML = `
-                    <div class="status-icon">🖥️</div>
-                    <h2 class="status-title">Версия для браузера</h2>
-                    <p class="status-description">Это версия для разработки и тестирования</p>
-                    <div style="margin-top: 15px; padding: 15px; background: #fef3c7; border-radius: 8px; border: 1px solid #f59e0b;">
-                        <p style="margin: 0; color: #92400e; font-size: 14px;">
-                            <strong>📱 Для тестирования в Telegram:</strong><br>
-                            Используйте бота @oborotn_bot и нажмите "🚀 Открыть ГосЗакупки"
-                        </p>
-                    </div>
-                `;
-            }
-        }
-
-        function setupEventListeners() {
-            // Search form
-            document.getElementById('searchForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                performSearch();
-            });
-        }
-
-        function performSearch() {
-            console.log('=== performSearch вызвана ===');
+        // Простая функция поиска
+        function simpleSearch() {
+            console.log('=== ПОИСК ЗАПУЩЕН ===');
             
             const searchInput = document.getElementById('searchInput');
             if (!searchInput) {
@@ -470,160 +112,65 @@
                 return;
             }
             
-            const searchQuery = searchInput.value.trim();
-            console.log('Значение поля поиска:', searchQuery);
-            
-            if (!searchQuery) {
-                console.log('Пустой запрос, поиск не выполняется');
-                return;
-            }
-
-            console.log('Запускаем поиск для запроса:', searchQuery);
-            
-            // Show notification
-            showNotification(`🔍 Поиск: "${searchQuery}" - ищем закупки...`);
-            
-            // Perform actual search
-            searchPurchases(searchQuery);
-        }
-        
-        // Mock data for demonstration
-        const mockPurchases = [
-            {
-                id: 1,
-                title: "Поставка канцелярских товаров для государственных учреждений",
-                status: "published",
-                price: 2500000,
-                region: "Москва",
-                customer: "Департамент образования г. Москвы",
-                deadline: "2024-12-31",
-                method: "electronic_auction",
-                description: "Поставка бумаги А4, ручек, карандашей и других канцелярских принадлежностей"
-            },
-            {
-                id: 2,
-                title: "Строительство автомобильной дороги регионального значения",
-                status: "bidding",
-                price: 150000000,
-                region: "Краснодарский край",
-                customer: "Министерство транспорта Краснодарского края",
-                deadline: "2024-11-15",
-                method: "tender",
-                description: "Строительство дороги протяженностью 15 км с мостовыми переходами"
-            },
-            {
-                id: 3,
-                title: "Разработка программного обеспечения для электронного документооборота",
-                status: "evaluation",
-                price: 8500000,
-                region: "Санкт-Петербург",
-                customer: "Комитет по информатизации и связи",
-                deadline: "2024-10-20",
-                method: "request_proposals",
-                description: "Создание системы электронного документооборота для государственных органов"
-            },
-            {
-                id: 4,
-                title: "Поставка медицинского оборудования для городской больницы",
-                status: "awarded",
-                price: 45000000,
-                region: "Новосибирск",
-                customer: "Городская клиническая больница №1",
-                deadline: "2024-09-30",
-                method: "electronic_auction",
-                description: "Поставка рентгеновского оборудования, УЗИ аппаратов и лабораторного оборудования"
-            },
-            {
-                id: 5,
-                title: "Оказание услуг по уборке и содержанию территории",
-                status: "published",
-                price: 1200000,
-                region: "Екатеринбург",
-                customer: "Администрация Ленинского района",
-                deadline: "2024-12-15",
-                method: "request_quotes",
-                description: "Уборка улиц, вывоз мусора, содержание зеленых насаждений"
-            }
-        ];
-        
-        function searchPurchases(query) {
-            // Show loading state
-            showLoadingState();
-            
-            console.log('=== ПОИСК ЗАПУЩЕН ===');
+            const query = searchInput.value.trim();
             console.log('Запрос:', query);
             
-            // Simple and reliable search
+            if (!query) {
+                alert('Введите запрос для поиска!');
+                return;
+            }
+            
+            // Обновляем debug информацию
+            document.getElementById('lastQuery').textContent = query;
+            const searchCount = parseInt(document.getElementById('searchCount').textContent) + 1;
+            document.getElementById('searchCount').textContent = searchCount;
+            
+            // Показываем loading
+            document.getElementById('results').innerHTML = '<p>🔍 Ищем закупки по запросу: "' + query + '"...</p>';
+            
+            // Имитируем поиск
             setTimeout(() => {
-                try {
-                    console.log('Генерируем результаты...');
-                    const results = generateSimpleResults(query);
-                    console.log('Результатов сгенерировано:', results.length);
-                    showSearchResults(results, query, false);
-                } catch (error) {
-                    console.error('Search failed:', error);
-                    // Always fallback to mock data
-                    const filtered = mockPurchases.filter(purchase => 
-                        purchase.title.toLowerCase().includes(query.toLowerCase()) ||
-                        purchase.description.toLowerCase().includes(query.toLowerCase()) ||
-                        purchase.region.toLowerCase().includes(query.toLowerCase()) ||
-                        purchase.customer.toLowerCase().includes(query.toLowerCase())
-                    );
-                    console.log('Fallback results:', filtered.length);
-                    showSearchResults(filtered, query, false);
-                }
+                console.log('Генерируем результаты...');
+                const results = generateResults(query);
+                console.log('Результатов сгенерировано:', results.length);
+                showResults(results, query);
             }, 1000);
         }
         
-        function generateSimpleResults(query) {
+        function generateResults(query) {
             const results = [];
             const queryLower = query.toLowerCase();
             
             console.log('Анализируем запрос:', queryLower);
             
-            if (queryLower.includes('бумага') || queryLower.includes('канц') || queryLower.includes('офис')) {
+            if (queryLower.includes('бумага') || queryLower.includes('канц')) {
                 console.log('Категория: Канцелярские товары');
-                for (let i = 1; i <= 15; i++) {
+                for (let i = 1; i <= 10; i++) {
                     results.push({
-                        id: `office_${i}`,
                         title: `Поставка канцелярских товаров ${i}`,
-                        status: 'Опубликовано',
                         price: Math.floor(Math.random() * 1000000) + 100000,
-                        region: 'Москва',
-                        customer: 'Департамент образования',
-                        deadline: '2024-12-31',
-                        method: 'Электронный аукцион',
-                        description: 'Поставка бумаги, ручек, карандашей'
+                        region: ['Москва', 'СПб', 'Краснодар'][Math.floor(Math.random() * 3)],
+                        status: 'Опубликовано'
                     });
                 }
-            } else if (queryLower.includes('строитель') || queryLower.includes('дорог') || queryLower.includes('ремонт')) {
+            } else if (queryLower.includes('строитель')) {
                 console.log('Категория: Строительство');
-                for (let i = 1; i <= 20; i++) {
+                for (let i = 1; i <= 8; i++) {
                     results.push({
-                        id: `construction_${i}`,
                         title: `Строительные работы ${i}`,
-                        status: 'Подача заявок',
                         price: Math.floor(Math.random() * 10000000) + 1000000,
-                        region: 'Краснодарский край',
-                        customer: 'Министерство транспорта',
-                        deadline: '2024-11-15',
-                        method: 'Открытый конкурс',
-                        description: 'Строительство и ремонт дорог'
+                        region: ['Москва', 'Краснодар', 'Ростов'][Math.floor(Math.random() * 3)],
+                        status: 'Подача заявок'
                     });
                 }
             } else {
                 console.log('Категория: Общие закупки');
-                for (let i = 1; i <= 25; i++) {
+                for (let i = 1; i <= 5; i++) {
                     results.push({
-                        id: `generic_${i}`,
                         title: `Закупка ${query} ${i}`,
-                        status: 'Опубликовано',
                         price: Math.floor(Math.random() * 500000) + 50000,
-                        region: 'Санкт-Петербург',
-                        customer: 'Администрация города',
-                        deadline: '2024-10-20',
-                        method: 'Запрос котировок',
-                        description: `Поставка товаров и услуг по запросу: ${query}`
+                        region: ['Москва', 'СПб', 'Екатеринбург'][Math.floor(Math.random() * 3)],
+                        status: 'Опубликовано'
                     });
                 }
             }
@@ -632,736 +179,50 @@
             return results;
         }
         
-        async function searchRealZakupki(query) {
-            try {
-                // Skip API call for now since it doesn't exist
-                console.log('Skipping API call, using simulation directly');
-                return await simulateZakupkiSearch(query);
-            } catch (error) {
-                console.error('Search simulation failed:', error);
-                // Return empty array as fallback
-                return [];
-            }
-        }
-        
-        async function simulateZakupkiSearch(query) {
-            // Simulate real zakupki.gov.ru search results
-            // This generates realistic data based on the search query
-            const baseResults = generateRealisticResults(query);
+        function showResults(results, query) {
+            console.log('Показываем результаты:', results.length);
             
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+            let html = `<h3>🔍 Результаты поиска: "${query}"</h3>`;
+            html += `<p>Найдено закупок: ${results.length}</p>`;
             
-            return baseResults;
-        }
-        
-        function generateRealisticResults(query) {
-            const results = [];
-            const queryLower = query.toLowerCase();
-            
-            // Generate results based on search query
-            if (queryLower.includes('бумага') || queryLower.includes('канц') || queryLower.includes('офис')) {
-                // Office supplies
-                for (let i = 1; i <= 25; i++) {
-                    results.push({
-                        id: `paper_${i}`,
-                        title: `Поставка канцелярских товаров ${i % 2 === 0 ? 'для школ' : 'для офисов'} ${getRandomRegion()}`,
-                        status: getRandomStatus(),
-                        price: Math.floor(Math.random() * 5000000) + 500000,
-                        region: getRandomRegion(),
-                        customer: getRandomCustomer('education'),
-                        deadline: getRandomDeadline(),
-                        method: getRandomMethod(),
-                        description: `Поставка бумаги А4, ручек, карандашей, папок и других канцелярских принадлежностей для ${i % 2 === 0 ? 'образовательных учреждений' : 'государственных органов'}`
-                    });
-                }
-            } else if (queryLower.includes('строитель') || queryLower.includes('дорог') || queryLower.includes('ремонт')) {
-                // Construction
-                for (let i = 1; i <= 35; i++) {
-                    results.push({
-                        id: `construction_${i}`,
-                        title: `${getRandomConstructionType()} ${getRandomRegion()}`,
-                        status: getRandomStatus(),
-                        price: Math.floor(Math.random() * 500000000) + 10000000,
-                        region: getRandomRegion(),
-                        customer: getRandomCustomer('construction'),
-                        deadline: getRandomDeadline(),
-                        method: getRandomMethod(),
-                        description: `${getRandomConstructionDescription()} в ${getRandomRegion()}`
-                    });
-                }
-            } else if (queryLower.includes('медицин') || queryLower.includes('больниц') || queryLower.includes('оборудован')) {
-                // Medical
-                for (let i = 1; i <= 30; i++) {
-                    results.push({
-                        id: `medical_${i}`,
-                        title: `Поставка медицинского оборудования для ${getRandomMedicalFacility()}`,
-                        status: getRandomStatus(),
-                        price: Math.floor(Math.random() * 100000000) + 5000000,
-                        region: getRandomRegion(),
-                        customer: getRandomCustomer('medical'),
-                        deadline: getRandomDeadline(),
-                        method: getRandomMethod(),
-                        description: `Поставка ${getRandomMedicalEquipment()} для медицинских учреждений`
-                    });
-                }
-            } else if (queryLower.includes('программ') || queryLower.includes('софт') || queryLower.includes('it')) {
-                // IT/Software
-                for (let i = 1; i <= 20; i++) {
-                    results.push({
-                        id: `it_${i}`,
-                        title: `Разработка ${getRandomSoftwareType()} для ${getRandomCustomer('it')}`,
-                        status: getRandomStatus(),
-                        price: Math.floor(Math.random() * 50000000) + 2000000,
-                        region: getRandomRegion(),
-                        customer: getRandomCustomer('it'),
-                        deadline: getRandomDeadline(),
-                        method: getRandomMethod(),
-                        description: `Создание и внедрение ${getRandomSoftwareType()} для автоматизации процессов`
-                    });
-                }
-            } else {
-                // Generic search - generate diverse results
-                for (let i = 1; i <= 40; i++) {
-                    results.push({
-                        id: `generic_${i}`,
-                        title: `${getRandomGenericTitle()} ${getRandomRegion()}`,
-                        status: getRandomStatus(),
-                        price: Math.floor(Math.random() * 10000000) + 100000,
-                        region: getRandomRegion(),
-                        customer: getRandomCustomer('generic'),
-                        deadline: getRandomDeadline(),
-                        method: getRandomMethod(),
-                        description: `${getRandomGenericDescription()} в ${getRandomRegion()}`
-                    });
-                }
-            }
-            
-            // Shuffle results to make them look more realistic
-            return results.sort(() => Math.random() - 0.5);
-        }
-        
-        // Helper functions for generating realistic data
-        function getRandomRegion() {
-            const regions = [
-                'Москва', 'Санкт-Петербург', 'Краснодарский край', 'Московская область',
-                'Ростовская область', 'Свердловская область', 'Республика Татарстан',
-                'Нижегородская область', 'Челябинская область', 'Самарская область',
-                'Республика Башкортостан', 'Красноярский край', 'Пермский край',
-                'Волгоградская область', 'Воронежская область', 'Новосибирская область'
-            ];
-            return regions[Math.floor(Math.random() * regions.length)];
-        }
-        
-        function getRandomStatus() {
-            const statuses = ['published', 'bidding', 'evaluation', 'awarded', 'completed'];
-            const weights = [0.3, 0.25, 0.2, 0.15, 0.1]; // More realistic distribution
-            const random = Math.random();
-            let cumulative = 0;
-            for (let i = 0; i < statuses.length; i++) {
-                cumulative += weights[i];
-                if (random <= cumulative) return statuses[i];
-            }
-            return statuses[0];
-        }
-        
-        function getRandomMethod() {
-            const methods = ['electronic_auction', 'tender', 'request_quotes', 'request_proposals'];
-            const weights = [0.4, 0.3, 0.2, 0.1]; // Electronic auctions are most common
-            const random = Math.random();
-            let cumulative = 0;
-            for (let i = 0; i < methods.length; i++) {
-                cumulative += weights[i];
-                if (random <= cumulative) return methods[i];
-            }
-            return methods[0];
-        }
-        
-        function getRandomCustomer(type) {
-            const customers = {
-                education: [
-                    'Департамент образования', 'Министерство образования', 'Управление образования',
-                    'Гимназия', 'Лицей', 'Школа', 'Университет', 'Колледж'
-                ],
-                construction: [
-                    'Министерство транспорта', 'Департамент строительства', 'Управление дорог',
-                    'Администрация района', 'Городская администрация', 'Областное правительство'
-                ],
-                medical: [
-                    'Министерство здравоохранения', 'Департамент здравоохранения',
-                    'Городская больница', 'Центральная районная больница', 'Поликлиника',
-                    'Медицинский центр', 'Санаторий'
-                ],
-                it: [
-                    'Комитет по информатизации', 'Департамент IT', 'Управление связи',
-                    'Центр информационных технологий', 'Администрация города'
-                ],
-                generic: [
-                    'Администрация', 'Министерство', 'Департамент', 'Управление',
-                    'Комитет', 'Федеральная служба', 'Агентство'
-                ]
-            };
-            
-            const typeCustomers = customers[type] || customers.generic;
-            const customer = typeCustomers[Math.floor(Math.random() * typeCustomers.length)];
-            const region = getRandomRegion();
-            
-            return `${customer} ${region}`;
-        }
-        
-        function getRandomDeadline() {
-            const now = new Date();
-            const futureDate = new Date(now.getTime() + Math.random() * 90 * 24 * 60 * 60 * 1000); // 0-90 days
-            return futureDate.toISOString().split('T')[0];
-        }
-        
-        function getRandomConstructionType() {
-            const types = [
-                'Строительство автомобильной дороги',
-                'Ремонт мостового перехода',
-                'Строительство жилого комплекса',
-                'Реконструкция здания',
-                'Строительство школы',
-                'Ремонт дорожного покрытия',
-                'Строительство больницы',
-                'Реконструкция стадиона'
-            ];
-            return types[Math.floor(Math.random() * types.length)];
-        }
-        
-        function getRandomConstructionDescription() {
-            const descriptions = [
-                'Строительные работы по возведению объекта',
-                'Ремонтно-строительные работы',
-                'Строительство инженерных сетей',
-                'Благоустройство территории',
-                'Строительство подъездных путей'
-            ];
-            return descriptions[Math.floor(Math.random() * descriptions.length)];
-        }
-        
-        function getRandomMedicalFacility() {
-            const facilities = [
-                'городской больницы', 'поликлиники', 'медицинского центра',
-                'санатория', 'диспансера', 'роддома', 'травмпункта'
-            ];
-            return facilities[Math.floor(Math.random() * facilities.length)];
-        }
-        
-        function getRandomMedicalEquipment() {
-            const equipment = [
-                'рентгеновского оборудования', 'УЗИ аппаратов', 'лабораторного оборудования',
-                'кардиологического оборудования', 'стоматологического оборудования',
-                'физиотерапевтического оборудования', 'реанимационного оборудования'
-            ];
-            return equipment[Math.floor(Math.random() * equipment.length)];
-        }
-        
-        function getRandomSoftwareType() {
-            const types = [
-                'программного обеспечения', 'информационной системы', 'веб-приложения',
-                'мобильного приложения', 'базы данных', 'системы электронного документооборота'
-            ];
-            return types[Math.floor(Math.random() * types.length)];
-        }
-        
-        function getRandomGenericTitle() {
-            const titles = [
-                'Поставка товаров для государственных нужд',
-                'Оказание услуг по содержанию территории',
-                'Поставка продуктов питания',
-                'Оказание транспортных услуг',
-                'Поставка мебели и оборудования',
-                'Оказание услуг связи',
-                'Поставка спецодежды',
-                'Оказание охранных услуг'
-            ];
-            return titles[Math.floor(Math.random() * titles.length)];
-        }
-        
-        function getRandomGenericDescription() {
-            const descriptions = [
-                'Оказание услуг по поставке товаров',
-                'Выполнение работ по обслуживанию',
-                'Поставка необходимого оборудования',
-                'Оказание консультационных услуг',
-                'Выполнение ремонтных работ'
-            ];
-            return descriptions[Math.floor(Math.random() * descriptions.length)];
-        }
-        
-        function showLoadingState() {
-            const searchSection = document.querySelector('.search-section');
-            searchSection.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-                    <h3 style="color: #1e293b; margin-bottom: 20px;">Ищем закупки...</h3>
-                    <div style="
-                        width: 40px;
-                        height: 40px;
-                        border: 4px solid #e2e8f0;
-                        border-top: 4px solid #3b82f6;
-                        border-radius: 50%;
-                        animation: spin 1s linear infinite;
-                        margin: 0 auto;
-                    "></div>
-                    <p style="color: #64748b; margin-top: 20px;">Поиск по запросу: "${document.getElementById('searchInput').value}"</p>
-                </div>
-            `;
-        }
-        
-        function showSearchResults(purchases, query, isRealData = false) {
-            console.log('Показываем результаты:', purchases.length);
-            
-            if (!purchases || purchases.length === 0) {
-                console.log('Нет результатов для отображения');
-                const searchSection = document.querySelector('.search-section');
-                if (searchSection) {
-                    searchSection.innerHTML = `
-                        <div style="text-align: center; padding: 40px;">
-                            <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-                            <h3 style="color: #1e293b; margin-bottom: 10px;">Закупки не найдены</h3>
-                            <p style="color: #64748b;">По запросу "${query}" ничего не найдено</p>
-                            <p style="color: #64748b; font-size: 14px; margin-top: 20px;">
-                                Попробуйте изменить запрос или использовать другие ключевые слова
-                            </p>
-                            <button onclick="showSearchForm()" style="
-                                background: #3b82f6;
-                                color: white;
-                                border: none;
-                                padding: 12px 24px;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                font-size: 14px;
-                                margin-top: 20px;
-                            ">
-                                ← Новый поиск
-                            </button>
-                        </div>
-                    `;
-                }
-                return;
-            }
-            
-            // Create results section
-            const resultsHTML = createResultsHTML(purchases, query, isRealData);
-            console.log('HTML результатов создан, длина:', resultsHTML.length);
-            
-            // Replace search section with results
-            const searchSection = document.querySelector('.search-section');
-            if (searchSection) {
-                searchSection.innerHTML = resultsHTML;
-                console.log('Секция поиска обновлена результатами');
-                
-                // Add back button
-                const backButton = document.createElement('div');
-                backButton.innerHTML = `
-                    <button onclick="showSearchForm()" style="
-                        background: #3b82f6;
-                        color: white;
-                        border: none;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        margin-top: 20px;
-                    ">
-                        ← Новый поиск
-                    </button>
-                `;
-                searchSection.appendChild(backButton);
-                console.log('Кнопка "Назад" добавлена');
-            } else {
-                console.error('Секция поиска не найдена!');
-            }
-        }
-        
-        function createResultsHTML(purchases, query, isRealData = false) {
-            if (purchases.length === 0) {
-                return `
-                    <div style="text-align: center; padding: 40px;">
-                        <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-                        <h3 style="color: #1e293b; margin-bottom: 10px;">Закупки не найдены</h3>
-                        <p style="color: #64748b;">По запросу "${query}" ничего не найдено</p>
-                        <p style="color: #64748b; font-size: 14px; margin-top: 20px;">
-                            Попробуйте изменить запрос или использовать другие ключевые слова
-                        </p>
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <h4>${result.title}</h4>
+                        <p><strong>Цена:</strong> ${result.price.toLocaleString()} ₽</p>
+                        <p><strong>Регион:</strong> ${result.region}</p>
+                        <p><strong>Статус:</strong> ${result.status}</p>
                     </div>
                 `;
-            }
-            
-            const dataSource = isRealData ? '🌐 zakupki.gov.ru' : '📱 Демо-данные';
-            
-            let resultsHTML = `
-                <h3 style="color: #1e293b; margin-bottom: 20px; text-align: center;">
-                    🔍 Результаты поиска: "${query}"
-                </h3>
-                <div style="
-                    background: ${isRealData ? '#dbeafe' : '#fef3c7'};
-                    color: ${isRealData ? '#1e40af' : '#d97706'};
-                    padding: 8px 16px;
-                    border-radius: 8px;
-                    text-align: center;
-                    margin-bottom: 20px;
-                    font-size: 14px;
-                    font-weight: 500;
-                ">
-                    ${dataSource} • Найдено закупок: ${purchases.length}
-                </div>
-                <div style="display: grid; gap: 20px;">
-            `;
-            
-            purchases.forEach(purchase => {
-                resultsHTML += createPurchaseCardHTML(purchase);
             });
             
-            resultsHTML += '</div>';
-            return resultsHTML;
-        }
-        
-        function createPurchaseCardHTML(purchase) {
-            const statusClass = `status-${purchase.status}`;
-            const statusText = getStatusText(purchase.status);
-            const methodText = getMethodText(purchase.method);
-            const priceText = formatPrice(purchase.price);
+            document.getElementById('results').innerHTML = html;
+            document.getElementById('lastResult').textContent = `${results.length} результатов`;
             
-            return `
-                <div style="
-                    background: white;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 12px;
-                    padding: 20px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                ">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <h4 style="
-                            font-size: 1.1rem;
-                            font-weight: 600;
-                            color: #1e293b;
-                            line-height: 1.4;
-                            margin: 0;
-                            flex: 1;
-                            margin-right: 15px;
-                        ">${purchase.title}</h4>
-                        <span style="
-                            padding: 6px 12px;
-                            border-radius: 20px;
-                            font-size: 12px;
-                            font-weight: 500;
-                            white-space: nowrap;
-                            ${getStatusStyle(purchase.status)}
-                        ">${statusText}</span>
-                    </div>
-                    
-                    <div style="
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                        gap: 15px;
-                        margin-bottom: 15px;
-                    ">
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
-                            <span>📍</span>
-                            <span>${purchase.region}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
-                            <span>🏢</span>
-                            <span>${purchase.customer}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
-                            <span>📋</span>
-                            <span>${methodText}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b;">
-                            <span>⏰</span>
-                            <span>До ${formatDate(purchase.deadline)}</span>
-                        </div>
-                    </div>
-                    
-                    <div style="
-                        font-size: 1.2rem;
-                        font-weight: 700;
-                        color: #059669;
-                        margin-bottom: 15px;
-                    ">${priceText}</div>
-                    
-                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <button onclick="addToFavorites(${purchase.id})" style="
-                            background: #f1f5f9;
-                            color: #64748b;
-                            border: none;
-                            padding: 8px 16px;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-size: 14px;
-                        ">⭐ В избранное</button>
-                        <button onclick="showPurchaseDetails(${purchase.id})" style="
-                            background: #3b82f6;
-                            color: white;
-                            border: none;
-                            padding: 8px 16px;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-size: 14px;
-                        ">📋 Подробнее</button>
-                    </div>
-                </div>
-            `;
+            console.log('Результаты отображены на странице');
         }
         
-        function getStatusText(status) {
-            const statuses = {
-                'published': 'Опубликовано',
-                'bidding': 'Подача заявок',
-                'evaluation': 'Рассмотрение',
-                'awarded': 'Присуждено',
-                'completed': 'Завершено',
-                'cancelled': 'Отменено'
-            };
-            return statuses[status] || status;
-        }
-        
-        function getMethodText(method) {
-            const methods = {
-                'electronic_auction': 'Электронный аукцион',
-                'tender': 'Открытый конкурс',
-                'request_quotes': 'Запрос котировок',
-                'request_proposals': 'Запрос предложений'
-            };
-            return methods[method] || method;
-        }
-        
-        function getStatusStyle(status) {
-            const styles = {
-                'published': 'background: #dbeafe; color: #1e40af;',
-                'bidding': 'background: #fef3c7; color: #d97706;',
-                'evaluation': 'background: #f3e8ff; color: #7c3aed;',
-                'awarded': 'background: #d1fae5; color: #059669;',
-                'completed': 'background: #d1fae5; color: #059669;',
-                'cancelled': 'background: #fee2e2; color: #dc2626;'
-            };
-            return styles[status] || 'background: #f1f5f9; color: #64748b;';
-        }
-        
-        function formatPrice(price) {
-            if (price >= 1000000) {
-                return `${(price / 1000000).toFixed(1)} млн ₽`;
-            } else if (price >= 1000) {
-                return `${(price / 1000).toFixed(0)} тыс ₽`;
-            }
-            return `${price} ₽`;
-        }
-        
-        function formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('ru-RU');
-        }
-        
-        function showSearchForm() {
-            // Restore original search form
-            const searchSection = document.querySelector('.search-section');
-            searchSection.innerHTML = `
-                <form class="search-form" id="searchForm">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="searchInput"
-                        placeholder="Введите название закупки, товара или услуги..."
-                        autocomplete="off"
-                    >
-                    <button type="submit" class="search-button">
-                        🔍 Найти закупки
-                    </button>
-                </form>
-                
-                <div class="search-examples">
-                    <p style="color: #64748b; font-size: 14px; margin: 0; text-align: center; margin-bottom: 15px;">
-                        💡 Примеры: "бумага А4 офисная", "строительство дорог", "медицинское оборудование"
-                    </p>
-                    <div style="text-align: center;">
-                        <button onclick="debugSearch()" style="
-                            background: #10b981;
-                            color: white;
-                            border: none;
-                            padding: 8px 16px;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-size: 14px;
-                            margin: 0 5px;
-                        ">🧪 Тест поиска</button>
-                        <button onclick="console.log('Debug info:', {form: document.getElementById('searchForm'), input: document.getElementById('searchInput'), button: document.querySelector('.search-button')})" style="
-                            background: #6b7280;
-                            color: white;
-                            border: none;
-                            padding: 8px 16px;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-size: 14px;
-                            margin: 0 5px;
-                        ">🔍 Проверить элементы</button>
-                    </div>
-                </div>
-            `;
-            
-            // Reattach event listener
-            document.getElementById('searchForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                performSearch();
-            });
-        }
-        
-        function addToFavorites(purchaseId) {
-            showNotification(`⭐ Закупка ${purchaseId} добавлена в избранное!`);
-        }
-        
-        function showPurchaseDetails(purchaseId) {
-            showNotification(`📋 Открываем детали закупки ${purchaseId}...`);
-            // Redirect to detail page
-            setTimeout(() => {
-                window.location.href = `purchase-detail.html?id=${purchaseId}`;
-            }, 1000);
-        }
-
-        function showNotification(message) {
-            try {
-                // Always use browser notification for now to avoid WebApp errors
-                console.log('Showing notification:', message);
-                showBrowserNotification(message);
-            } catch (error) {
-                console.log('Notification failed:', error);
-                // Last resort: console log
-                console.log('NOTIFICATION:', message);
-            }
-        }
-        
-        function showBrowserNotification(message) {
-            // Create a custom notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #3b82f6;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 10000;
-                max-width: 300px;
-                word-wrap: break-word;
-                animation: slideIn 0.3s ease-out;
-            `;
-            notification.textContent = message;
-            
-            // Add animation CSS
-            if (!document.getElementById('notification-styles')) {
-                const style = document.createElement('style');
-                style.id = 'notification-styles';
-                style.textContent = `
-                    @keyframes slideIn {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    @keyframes slideOut {
-                        from { transform: translateX(0); opacity: 1; }
-                        to { transform: translateX(100%); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            document.body.appendChild(notification);
-            
-            // Auto-remove after 3 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-out';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-        
-        // Initialize search form when page loads
+        // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== DOMContentLoaded сработал ===');
-            console.log('Инициализируем форму поиска...');
+            console.log('=== СТРАНИЦА ЗАГРУЖЕНА ===');
+            document.getElementById('loadTime').textContent = new Date().toLocaleString();
             
-            // Check Telegram WebApp version and capabilities
-            if (window.Telegram && window.Telegram.WebApp) {
-                const tg = window.Telegram.WebApp;
-                console.log('Telegram WebApp обнаружен:', {
-                    version: tg.version,
-                    platform: tg.platform,
-                    colorScheme: tg.colorScheme,
-                    themeParams: tg.themeParams,
-                    initData: tg.initData ? 'Available' : 'Not available',
-                    initDataUnsafe: tg.initDataUnsafe ? 'Available' : 'Not available'
-                });
-                
-                // Check available methods
-                const availableMethods = [];
-                if (tg.showPopup) availableMethods.push('showPopup');
-                if (tg.showAlert) availableMethods.push('showAlert');
-                if (tg.MainButton) availableMethods.push('MainButton');
-                if (tg.BackButton) availableMethods.push('BackButton');
-                
-                console.log('Доступные методы Telegram:', availableMethods);
-            } else {
-                console.log('Telegram WebApp не обнаружен, работаем в режиме браузера');
-            }
+            // Автоматический поиск при Enter
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    simpleSearch();
+                }
+            });
             
-            // Find the search form and attach event listener
-            const searchForm = document.getElementById('searchForm');
-            console.log('Поиск формы:', searchForm ? 'НАЙДЕНА' : 'НЕ НАЙДЕНА');
-            
-            if (searchForm) {
-                console.log('Прикрепляем event listener к форме...');
-                searchForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    console.log('Форма отправлена, вызываем performSearch...');
-                    performSearch();
-                });
-                console.log('Event listener к форме прикреплен');
-            } else {
-                console.error('Форма поиска не найдена!');
-            }
-            
-            // Also attach click event to search button for extra reliability
-            const searchButton = document.querySelector('.search-button');
-            console.log('Поиск кнопки:', searchButton ? 'НАЙДЕНА' : 'НЕ НАЙДЕНА');
-            
-            if (searchButton) {
-                console.log('Прикрепляем click listener к кнопке...');
-                searchButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Кнопка нажата, вызываем performSearch...');
-                    performSearch();
-                });
-                console.log('Click listener к кнопке прикреплен');
-            } else {
-                console.error('Кнопка поиска не найдена!');
-            }
-            
-            // Проверяем все элементы формы
-            console.log('=== ПРОВЕРКА ЭЛЕМЕНТОВ ===');
-            console.log('searchForm:', document.getElementById('searchForm'));
-            console.log('searchInput:', document.getElementById('searchInput'));
-            console.log('searchButton:', document.querySelector('.search-button'));
-            console.log('search-section:', document.querySelector('.search-section'));
-            
-            console.log('Инициализация формы поиска завершена!');
+            console.log('Event listeners подключены');
+            console.log('Поиск готов к работе!');
         });
         
-        // Debug function to test search manually
-        function debugSearch() {
-            console.log('Debug search called');
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                console.log('Search input value:', searchInput.value);
-                performSearch();
-            } else {
-                console.error('Search input not found!');
-            }
+        // Проверка Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            console.log('Telegram WebApp обнаружен:', window.Telegram.WebApp.version);
+        } else {
+            console.log('Telegram WebApp не обнаружен');
         }
     </script>
 </body>
