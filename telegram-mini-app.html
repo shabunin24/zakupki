@@ -1072,9 +1072,31 @@
                 </form>
                 
                 <div class="search-examples">
-                    <p style="color: #64748b; font-size: 14px; margin: 0; text-align: center;">
+                    <p style="color: #64748b; font-size: 14px; margin: 0; text-align: center; margin-bottom: 15px;">
                         💡 Примеры: "бумага А4 офисная", "строительство дорог", "медицинское оборудование"
                     </p>
+                    <div style="text-align: center;">
+                        <button onclick="debugSearch()" style="
+                            background: #10b981;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            margin: 0 5px;
+                        ">🧪 Тест поиска</button>
+                        <button onclick="console.log('Debug info:', {form: document.getElementById('searchForm'), input: document.getElementById('searchInput'), button: document.querySelector('.search-button')})" style="
+                            background: #6b7280;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            margin: 0 5px;
+                        ">🔍 Проверить элементы</button>
+                    </div>
                 </div>
             `;
             
@@ -1105,6 +1127,49 @@
             } else {
                 // Use browser alert
                 alert(message);
+            }
+        }
+        
+        // Initialize search form when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing search form...');
+            
+            // Find the search form and attach event listener
+            const searchForm = document.getElementById('searchForm');
+            if (searchForm) {
+                console.log('Search form found, attaching event listener...');
+                searchForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Search form submitted, calling performSearch...');
+                    performSearch();
+                });
+            } else {
+                console.error('Search form not found!');
+            }
+            
+            // Also attach click event to search button for extra reliability
+            const searchButton = document.querySelector('.search-button');
+            if (searchButton) {
+                console.log('Search button found, attaching click listener...');
+                searchButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Search button clicked, calling performSearch...');
+                    performSearch();
+                });
+            }
+            
+            console.log('Search form initialization complete!');
+        });
+        
+        // Debug function to test search manually
+        function debugSearch() {
+            console.log('Debug search called');
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                console.log('Search input value:', searchInput.value);
+                performSearch();
+            } else {
+                console.error('Search input not found!');
             }
         }
     </script>
